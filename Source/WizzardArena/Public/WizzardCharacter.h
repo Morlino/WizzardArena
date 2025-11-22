@@ -19,13 +19,14 @@ public:
 private:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Input, meta = (AllowPrivateAccess = "true"));
 	class UInputAction* MoveAction;
-	
+
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
 	void Move(const FInputActionValue& Value);
-	
+	void RotateToCursor();
+
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
@@ -35,6 +36,9 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Components);
 	class USpringArmComponent* SpringArmComp;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Mesh);
+	FRotator MeshRotationOffset = FRotator(0.0f, -90.0f, 0.0f);
 
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;

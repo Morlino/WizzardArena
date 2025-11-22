@@ -8,6 +8,8 @@ void AWizzardPlayerController::BeginPlay()
 {
 	Super::BeginPlay();
 
+	bShowMouseCursor = true;
+	
 	if (UEnhancedInputLocalPlayerSubsystem* Subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(GetLocalPlayer()))
 	{
 		Subsystem->AddMappingContext(InputMapping, 0);
