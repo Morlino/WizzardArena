@@ -1,8 +1,0 @@
-{
-	"SourceFiles": [
-		"E:\\Documents\\Unreal Projects\\WizzardArena\\Source\\WizzardArena\\WizzardArena.Build.cs",
-		"E:\\Documents\\Unreal Projects\\WizzardArena\\Source\\WizzardArena.Target.cs",
-		"E:\\Documents\\Unreal Projects\\WizzardArena\\Source\\WizzardArenaEditor.Target.cs"
-	],
-	"EngineVersion": "5.6.1"
-}
