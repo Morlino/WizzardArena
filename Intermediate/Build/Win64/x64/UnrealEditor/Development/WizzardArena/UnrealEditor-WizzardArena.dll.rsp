@@ -37,12 +37,16 @@
 /NOIMPLIB
 /NOEXP
 "E:/Documents/Unreal Projects/WizzardArena/Intermediate/Build/Win64/x64/WizzardArenaEditor/Development/UnrealEd/SharedPCH.UnrealEd.Project.ValApi.ValExpApi.Cpp20.h.obj"
+"E:/Documents/Unreal Projects/WizzardArena/Intermediate/Build/Win64/x64/UnrealEditor/Development/WizzardArena/Module.WizzardArena.gen.cpp.obj"
 "E:/Documents/Unreal Projects/WizzardArena/Intermediate/Build/Win64/x64/UnrealEditor/Development/WizzardArena/WizzardArena.cpp.obj"
 "E:/Documents/Unreal Projects/WizzardArena/Intermediate/Build/Win64/x64/UnrealEditor/Development/WizzardArena/PerModuleInline.gen.cpp.obj"
+"E:/Documents/Unreal Projects/WizzardArena/Intermediate/Build/Win64/x64/UnrealEditor/Development/WizzardArena/WizzardCharacter.cpp.obj"
+"E:/Documents/Unreal Projects/WizzardArena/Intermediate/Build/Win64/x64/UnrealEditor/Development/WizzardArena/WizzardGameMode.cpp.obj"
+"E:/Documents/Unreal Projects/WizzardArena/Intermediate/Build/Win64/x64/UnrealEditor/Development/WizzardArena/WizzardPlayerController.cpp.obj"
 "E:/Documents/Unreal Projects/WizzardArena/Intermediate/Build/Win64/x64/UnrealEditor/Development/WizzardArena/Default.rc2.res"
+"../Intermediate/Build/Win64/x64/UnrealEditor/Development/Engine/UnrealEditor-Engine.lib"
 "../Intermediate/Build/Win64/x64/UnrealEditor/Development/Core/UnrealEditor-Core.lib"
 "../Intermediate/Build/Win64/x64/UnrealEditor/Development/CoreUObject/UnrealEditor-CoreUObject.lib"
-"../Intermediate/Build/Win64/x64/UnrealEditor/Development/Engine/UnrealEditor-Engine.lib"
 "../Intermediate/Build/Win64/x64/UnrealEditor/Development/InputCore/UnrealEditor-InputCore.lib"
 "../Plugins/EnhancedInput/Intermediate/Build/Win64/x64/UnrealEditor/Development/EnhancedInput/UnrealEditor-EnhancedInput.lib"
 "delayimp.lib"

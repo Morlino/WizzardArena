@@ -1,5 +1,11 @@
 {
 	"RemapUnityFiles": 
 	{
+		"Module.WizzardArena.gen.cpp.obj": [
+			"WizzardArena.init.gen.cpp.obj",
+			"WizzardCharacter.gen.cpp.obj",
+			"WizzardGameMode.gen.cpp.obj",
+			"WizzardPlayerController.gen.cpp.obj"
+		]
 	}
 }

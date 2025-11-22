@@ -11,6 +11,10 @@
     <None Include="..\..\Source\WizzardArenaEditor.Target.cs">
       <Filter>Source</Filter>
     </None>
+    <None Include="..\..\.gitignore" />
+    <None Include="..\..\.vsconfig" />
+    <None Include="..\..\b_clean_intermediate_files.bat" />
+    <None Include="..\..\README.md" />
     <Filter Include="Config">
       <UniqueIdentifier>{FA535FFB-25E1-3D20-B416-52F9BE21E06E}</UniqueIdentifier>
     </Filter>
@@ -37,6 +41,30 @@
     </ClCompile>
     <ClInclude Include="..\..\Source\WizzardArena\WizzardArena.h">
       <Filter>Source\WizzardArena</Filter>
+    </ClInclude>
+    <Filter Include="Source\WizzardArena\Private">
+      <UniqueIdentifier>{8F7DBC80-066B-3542-BEC0-EA9704A6C492}</UniqueIdentifier>
+    </Filter>
+    <ClCompile Include="..\..\Source\WizzardArena\Private\WizzardCharacter.cpp">
+      <Filter>Source\WizzardArena\Private</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\WizzardArena\Private\WizzardGameMode.cpp">
+      <Filter>Source\WizzardArena\Private</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\WizzardArena\Private\WizzardPlayerController.cpp">
+      <Filter>Source\WizzardArena\Private</Filter>
+    </ClCompile>
+    <Filter Include="Source\WizzardArena\Public">
+      <UniqueIdentifier>{1AA5B224-9FEF-3B28-88DC-7808AB3E0CCA}</UniqueIdentifier>
+    </Filter>
+    <ClInclude Include="..\..\Source\WizzardArena\Public\WizzardCharacter.h">
+      <Filter>Source\WizzardArena\Public</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\WizzardArena\Public\WizzardGameMode.h">
+      <Filter>Source\WizzardArena\Public</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\WizzardArena\Public\WizzardPlayerController.h">
+      <Filter>Source\WizzardArena\Public</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
