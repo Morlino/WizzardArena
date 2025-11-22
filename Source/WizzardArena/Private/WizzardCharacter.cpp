@@ -7,7 +7,10 @@
 #include "Camera/CameraComponent.h"
 #include "GameFramework/SpringArmComponent.h"
 #include "EnhancedInputComponent.h"
+#include "Projects.h"
 #include "WizzardPlayerController.h"
+#include "DSP/BufferDiagnostics.h"
+#include "GeometryCollection/GeometryCollectionParticlesData.h"
 
 // Sets default values
 AWizzardCharacter::AWizzardCharacter()
@@ -15,7 +18,8 @@ AWizzardCharacter::AWizzardCharacter()
  	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 
-	SpringArmComp = CreateDefaultSubobject<USpringArmComponent>(TEXT("Spring Arm"));
+	// Camera
+	SpringArmComp = CreateDefaultSubobject<USpringArmComponent>(TEXT("SpringArm"));
 	SpringArmComp->SetupAttachment(RootComponent);
 	SpringArmComp->SetRelativeRotation(FRotator(-60.0f, 0.0f, 0.0f));
 	SpringArmComp->TargetArmLength = 800.0f;
@@ -23,6 +27,11 @@ AWizzardCharacter::AWizzardCharacter()
 
 	CameraComp = CreateDefaultSubobject<UCameraComponent>(TEXT("Camera"));
 	CameraComp->SetupAttachment(SpringArmComp);
+
+	// Combat
+	ProjectileSpawnPoint = CreateDefaultSubobject<USceneComponent>(TEXT("ProjectileSpawnPoint"));
+	ProjectileSpawnPoint->SetupAttachment(GetMesh());
+	ProjectileSpawnPoint->SetRelativeLocation(FVector(-30.0f, 40.0f, 120.0f));
 }
 
 // Called when the game starts or when spawned
@@ -46,11 +55,7 @@ void AWizzardCharacter::Move(const FInputActionValue& Value)
 void AWizzardCharacter::RotateToCursor()
 {
 	APlayerController* PC = Cast<APlayerController>(GetController());
-	if (!PC) 
-	{
-		UE_LOG(LogTemp, Warning, TEXT("RotateToCursor: No PlayerController!"));
-		return;
-	}
+	if (!PC) return;
 
 	FVector WorldLocation, WorldDirection;
 	if (PC->DeprojectMousePositionToWorld(WorldLocation, WorldDirection))
@@ -62,13 +67,11 @@ void AWizzardCharacter::RotateToCursor()
 			FVector::UpVector
 		);
 
+		// Save cursor location
+		CursorWorldLocation = PlaneIntersection;
+
 		FVector LookDir = PlaneIntersection - GetActorLocation();
 		LookDir.Z = 0.0f;
-
-		UE_LOG(LogTemp, Log, TEXT("Cursor WorldLocation: %s, Intersection: %s, LookDir: %s"), 
-			*WorldLocation.ToString(), 
-			*PlaneIntersection.ToString(), 
-			*LookDir.ToString());
 
 		if (!LookDir.IsNearlyZero())
 		{
@@ -77,17 +80,7 @@ void AWizzardCharacter::RotateToCursor()
 			TargetRotation.Roll = 0.f;
 			FRotator MeshOffset(MeshRotationOffset);
 			GetMesh()->SetWorldRotation(TargetRotation + MeshOffset);
-
-			UE_LOG(LogTemp, Log, TEXT("Rotating to: %s"), *TargetRotation.ToString());
 		}
-		else
-		{
-			UE_LOG(LogTemp, Warning, TEXT("LookDir is zero, skipping rotation"));
-		}
-	}
-	else
-	{
-		UE_LOG(LogTemp, Warning, TEXT("DeprojectMousePositionToWorld failed"));
 	}
 }
 
@@ -97,6 +90,45 @@ void AWizzardCharacter::Tick(float DeltaTime)
 	Super::Tick(DeltaTime);
 
 	RotateToCursor();
+
+	FireCurrentCooldown -= DeltaTime;
+	if (bIsFiring)
+	{
+		if (FireCurrentCooldown <= 0.0f)
+		{
+			ShootProjectile();
+			FireCurrentCooldown = FireCooldown;
+		}
+	}
+}
+
+void AWizzardCharacter::ShootProjectile()
+{
+	if (!ProjectileClass) return;
+
+	FVector SpawnLocation = ProjectileSpawnPoint->GetComponentLocation();
+	FVector ShootDir = (CursorWorldLocation - SpawnLocation).GetSafeNormal2D();
+	FRotator SpawnRotation = ShootDir.Rotation();
+
+	FActorSpawnParameters SpawnParams;
+	SpawnParams.Owner = this;
+	SpawnParams.Instigator = GetInstigator();
+
+	GetWorld()->SpawnActor<AActor>(ProjectileClass, SpawnLocation, SpawnRotation, SpawnParams);
+
+	UE_LOG(LogTemp, Log, TEXT("Projectile spawned at %s"), *SpawnLocation.ToString());
+}
+
+void AWizzardCharacter::StartFiring()
+{
+	UE_LOG(LogTemp, Log, TEXT("StartFiring"));
+	bIsFiring = true;
+}
+
+void AWizzardCharacter::StopFiring()
+{
+	UE_LOG(LogTemp, Log, TEXT("StopFiring"));
+	bIsFiring = false;
 }
 
 // Called to bind functionality to input
@@ -109,6 +141,10 @@ void AWizzardCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCo
 	{
 		// Moving
 		EnhancedInputComponent->BindAction(MoveAction, ETriggerEvent::Triggered, this, &AWizzardCharacter::Move);
+
+		// Fire
+		EnhancedInputComponent->BindAction(FireAction, ETriggerEvent::Started, this, &AWizzardCharacter::StartFiring);
+		EnhancedInputComponent->BindAction(FireAction, ETriggerEvent::Completed, this, &AWizzardCharacter::StopFiring);
 	}
 }
 

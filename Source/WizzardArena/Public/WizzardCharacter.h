@@ -20,11 +20,22 @@ private:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Input, meta = (AllowPrivateAccess = "true"));
 	class UInputAction* MoveAction;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Input, meta = (AllowPrivateAccess = "true"));
+	class UInputAction* FireAction;
+
+	FVector CursorWorldLocation;
+
+	// Combat
+	bool bIsFiring = false;
+
+	float FireCurrentCooldown = 0.0f;
+
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
 	void Move(const FInputActionValue& Value);
+
 	void RotateToCursor();
 
 	// Called to bind functionality to input
@@ -37,9 +48,27 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Components);
 	class USpringArmComponent* SpringArmComp;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Combat);
+	class USceneComponent* ProjectileSpawnPoint;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Combat);
+	TSubclassOf<AActor> ProjectileClass;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Combat);
+	float FireCooldown = 1.0f;
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Mesh);
 	FRotator MeshRotationOffset = FRotator(0.0f, -90.0f, 0.0f);
 
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
+
+	UFUNCTION()
+	void ShootProjectile();
+
+	UFUNCTION()
+	void StartFiring();
+
+	UFUNCTION()
+	void StopFiring();
 };
