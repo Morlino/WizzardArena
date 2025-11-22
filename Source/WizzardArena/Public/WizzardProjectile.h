@@ -28,4 +28,16 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Components)
 	class UProjectileMovementComponent* ProjectileMovement;
+
+	// Damage (optional)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Combat")
+	float Damage = 10.f;
+
+	// Particle effect on impact
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Effects")
+	class UNiagaraSystem* HitEffect;
+	
+	// Hit handling
+	UFUNCTION()
+	void OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit);
 };
