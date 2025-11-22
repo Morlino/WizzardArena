@@ -1,0 +1,13 @@
+/NOLOGO
+/errorReport:prompt
+/MACHINE:x64
+/SUBSYSTEM:WINDOWS
+/DEF
+/NAME:"UnrealEditor-WizzardArena.dll"
+/IGNORE:4221
+/NODEFAULTLIB
+"E:/Documents/Unreal Projects/WizzardArena/Intermediate/Build/Win64/x64/WizzardArenaEditor/Development/UnrealEd/SharedPCH.UnrealEd.Project.ValApi.ValExpApi.Cpp20.h.obj"
+"E:/Documents/Unreal Projects/WizzardArena/Intermediate/Build/Win64/x64/UnrealEditor/Development/WizzardArena/WizzardArena.cpp.obj"
+"E:/Documents/Unreal Projects/WizzardArena/Intermediate/Build/Win64/x64/UnrealEditor/Development/WizzardArena/PerModuleInline.gen.cpp.obj"
+"E:/Documents/Unreal Projects/WizzardArena/Intermediate/Build/Win64/x64/UnrealEditor/Development/WizzardArena/Default.rc2.res"
+/OUT:"E:/Documents/Unreal Projects/WizzardArena/Intermediate/Build/Win64/x64/UnrealEditor/Development/WizzardArena/UnrealEditor-WizzardArena.lib"
