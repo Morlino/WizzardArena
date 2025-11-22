@@ -22,4 +22,10 @@ protected:
 public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Input")
 	UInputMappingContext* InputMapping;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = UI)
+	TSubclassOf<class UWizzardHUD> WizzardHUDClass;
+	
+	UPROPERTY()
+	class UWizzardHUD* WizzardHUD;
 };

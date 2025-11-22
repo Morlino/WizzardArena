@@ -23,6 +23,8 @@ private:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Input, meta = (AllowPrivateAccess = "true"));
 	class UInputAction* FireAction;
 
+	class UWizzardHUD* WizzardHUD;
+
 	FVector CursorWorldLocation;
 
 	// Combat
@@ -34,12 +36,18 @@ protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
+	void InitHUD();
+
 	void Move(const FInputActionValue& Value);
 
 	void RotateToCursor();
 
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
+
+	void Die();
+
+	void TakeDamage(float DamageAmount);
 
 public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Components);
@@ -57,11 +65,19 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Combat);
 	float FireCooldown = 1.0f;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Combat);
+	float CurrentHealth;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Combat);
+	float MaxHealth = 100.0f;
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Mesh);
 	FRotator MeshRotationOffset = FRotator(0.0f, -90.0f, 0.0f);
 
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
+
+	void SetHUDReference(UWizzardHUD* HUD);
 
 	UFUNCTION()
 	void ShootProjectile();

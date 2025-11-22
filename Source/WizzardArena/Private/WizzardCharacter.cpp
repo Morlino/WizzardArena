@@ -3,14 +3,11 @@
 
 #include "WizzardCharacter.h"
 
-#include "NavigationSystemTypes.h"
 #include "Camera/CameraComponent.h"
 #include "GameFramework/SpringArmComponent.h"
 #include "EnhancedInputComponent.h"
-#include "Projects.h"
+#include "WizzardHUD.h"
 #include "WizzardPlayerController.h"
-#include "DSP/BufferDiagnostics.h"
-#include "GeometryCollection/GeometryCollectionParticlesData.h"
 
 // Sets default values
 AWizzardCharacter::AWizzardCharacter()
@@ -32,6 +29,11 @@ AWizzardCharacter::AWizzardCharacter()
 	ProjectileSpawnPoint = CreateDefaultSubobject<USceneComponent>(TEXT("ProjectileSpawnPoint"));
 	ProjectileSpawnPoint->SetupAttachment(GetMesh());
 	ProjectileSpawnPoint->SetRelativeLocation(FVector(-30.0f, 40.0f, 120.0f));
+
+	CurrentHealth = MaxHealth;
+
+	// HUD
+	
 }
 
 // Called when the game starts or when spawned
@@ -39,6 +41,12 @@ void AWizzardCharacter::BeginPlay()
 {
 	Super::BeginPlay();
 	
+}
+
+void AWizzardCharacter::InitHUD()
+{
+	// Set starting health
+	WizzardHUD->SetHealth(CurrentHealth, MaxHealth);
 }
 
 void AWizzardCharacter::Move(const FInputActionValue& Value)
@@ -102,6 +110,17 @@ void AWizzardCharacter::Tick(float DeltaTime)
 	}
 }
 
+void AWizzardCharacter::SetHUDReference(UWizzardHUD* HUD)
+{
+	WizzardHUD = HUD;
+
+	// Optional: initialize HUD values immediately
+	if (WizzardHUD)
+	{
+		WizzardHUD->SetHealth(CurrentHealth, MaxHealth);
+	}
+}
+
 void AWizzardCharacter::ShootProjectile()
 {
 	if (!ProjectileClass) return;
@@ -148,3 +167,24 @@ void AWizzardCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCo
 	}
 }
 
+void AWizzardCharacter::Die()
+{
+	UE_LOG(LogTemp, Log, TEXT("You Died"));
+
+	Destroy();
+}
+
+void AWizzardCharacter::TakeDamage(float DamageAmount)
+{
+	CurrentHealth = FMath::Clamp(CurrentHealth - DamageAmount, 0.f, MaxHealth);
+
+	if (WizzardHUD)
+	{
+		WizzardHUD->SetHealth(CurrentHealth, MaxHealth);
+	}
+
+	if (CurrentHealth <= 0.f)
+	{
+		Die();
+	}
+}
