@@ -8,6 +8,8 @@
 #include "EnhancedInputComponent.h"
 #include "WizzardHUD.h"
 #include "WizzardPlayerController.h"
+#include "Components/SphereComponent.h"
+#include "Kismet/GameplayStatics.h"
 
 // Sets default values
 AWizzardCharacter::AWizzardCharacter()
@@ -25,15 +27,21 @@ AWizzardCharacter::AWizzardCharacter()
 	CameraComp = CreateDefaultSubobject<UCameraComponent>(TEXT("Camera"));
 	CameraComp->SetupAttachment(SpringArmComp);
 
-	// Combat
+	// Stats
+	CurrentHealth = MaxHealth;
+
+	// Projectile
 	ProjectileSpawnPoint = CreateDefaultSubobject<USceneComponent>(TEXT("ProjectileSpawnPoint"));
 	ProjectileSpawnPoint->SetupAttachment(GetMesh());
 	ProjectileSpawnPoint->SetRelativeLocation(FVector(-30.0f, 40.0f, 120.0f));
 
-	CurrentHealth = MaxHealth;
-
-	// HUD
-	
+	// Dash Collision
+	DashCollisionSphere = CreateDefaultSubobject<USphereComponent>(TEXT("DashCollision"));
+	DashCollisionSphere->SetupAttachment(RootComponent);
+	DashCollisionSphere->SetSphereRadius(DashDamageRadius);
+	DashCollisionSphere->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	DashCollisionSphere->SetCollisionResponseToAllChannels(ECR_Overlap);
+	DashCollisionSphere->OnComponentBeginOverlap.AddDynamic(this, &AWizzardCharacter::OnDashOverlap);
 }
 
 // Called when the game starts or when spawned
@@ -52,7 +60,7 @@ void AWizzardCharacter::InitHUD()
 void AWizzardCharacter::Move(const FInputActionValue& Value)
 {
 	FVector2D MovementVector = Value.Get<FVector2D>();
-	
+
 	// Log the input values
 	UE_LOG(LogTemp, Log, TEXT("Move Input: X=%.2f, Y=%.2f"), MovementVector.X, MovementVector.Y);
 
@@ -97,9 +105,14 @@ void AWizzardCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-	RotateToCursor();
-
+	// Cooldowns decrement
 	FireCurrentCooldown -= DeltaTime;
+
+	if (bIsDashing)
+	{
+		HandleDash(DeltaTime);
+	}
+
 	if (bIsFiring)
 	{
 		if (FireCurrentCooldown <= 0.0f)
@@ -108,6 +121,15 @@ void AWizzardCharacter::Tick(float DeltaTime)
 			FireCurrentCooldown = FireCooldown;
 		}
 	}
+
+	RotateToCursor();
+}
+
+FVector AWizzardCharacter::GetMeshForwardVector() const
+{
+	FRotator MeshRot = GetMesh()->GetComponentRotation() - MeshRotationOffset;
+
+	return MeshRot.Vector();
 }
 
 void AWizzardCharacter::SetHUDReference(UWizzardHUD* HUD)
@@ -121,9 +143,21 @@ void AWizzardCharacter::SetHUDReference(UWizzardHUD* HUD)
 	}
 }
 
+float AWizzardCharacter::GetCurrentHealth()
+{
+	return CurrentHealth;
+}
+
+float AWizzardCharacter::GetMaxHealth()
+{
+	return MaxHealth;
+}
+
 void AWizzardCharacter::ShootProjectile()
 {
 	if (!ProjectileClass) return;
+
+	if (bIsDashing) return;
 
 	FVector SpawnLocation = ProjectileSpawnPoint->GetComponentLocation();
 	FVector ShootDir = (CursorWorldLocation - SpawnLocation).GetSafeNormal2D();
@@ -150,6 +184,54 @@ void AWizzardCharacter::StopFiring()
 	bIsFiring = false;
 }
 
+void AWizzardCharacter::StartDash()
+{
+	if (bIsDashing) return;
+
+	UE_LOG(LogTemp, Log, TEXT("StartDash"));
+
+	FVector DashDir = FVector::ZeroVector;
+
+	// Check movement input by looking at velocity on XY plane
+	FVector HorizontalVelocity = GetVelocity();
+	HorizontalVelocity.Z = 0.f;
+
+	if (!HorizontalVelocity.IsNearlyZero())
+	{
+		DashDir = HorizontalVelocity.GetSafeNormal();
+	}
+	else
+	{
+		DashDir = GetMeshForwardVector();
+	}
+
+	DashStart = GetActorLocation();
+	DashTarget = DashStart + DashDir * DashDistance;
+	DashElapsedTime = 0.f;
+	bIsDashing = true;
+
+	// Enable dash collision
+	DashCollisionSphere->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
+}
+
+void AWizzardCharacter::HandleDash(float DeltaTime)
+{
+	UE_LOG(LogTemp, Log, TEXT("HandleDash"));
+
+	DashElapsedTime += DeltaTime;
+	float Alpha = FMath::Clamp(DashElapsedTime / DashDuration, 0.0f, 1.0f);
+
+	FVector NewLocation = FMath::Lerp(DashStart, DashTarget, Alpha);
+	FHitResult Hit;
+	SetActorLocation(NewLocation, true, &Hit);
+
+	if (Alpha >= 1.0f)
+	{
+		bIsDashing = false;
+		DashCollisionSphere->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	}
+}
+
 // Called to bind functionality to input
 void AWizzardCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
@@ -164,6 +246,9 @@ void AWizzardCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCo
 		// Fire
 		EnhancedInputComponent->BindAction(FireAction, ETriggerEvent::Started, this, &AWizzardCharacter::StartFiring);
 		EnhancedInputComponent->BindAction(FireAction, ETriggerEvent::Completed, this, &AWizzardCharacter::StopFiring);
+
+		// Dash
+		EnhancedInputComponent->BindAction(DashAction, ETriggerEvent::Triggered, this, &AWizzardCharacter::StartDash);
 	}
 }
 
@@ -174,9 +259,10 @@ void AWizzardCharacter::Die()
 	Destroy();
 }
 
-void AWizzardCharacter::TakeDamage(float DamageAmount)
+float AWizzardCharacter::TakeDamage(float Damage, const FDamageEvent& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
 {
-	CurrentHealth = FMath::Clamp(CurrentHealth - DamageAmount, 0.f, MaxHealth);
+	float ActualDamage = FMath::Clamp(Damage, 0.f, MaxHealth);
+	CurrentHealth -= ActualDamage;
 
 	if (WizzardHUD)
 	{
@@ -187,4 +273,16 @@ void AWizzardCharacter::TakeDamage(float DamageAmount)
 	{
 		Die();
 	}
+
+	return ActualDamage;
+}
+
+void AWizzardCharacter::OnDashOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
+	UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
+{
+	if (!OtherActor || OtherActor == this) return;
+
+	UE_LOG(LogTemp, Log, TEXT("Dash Overlap"));
+
+	UGameplayStatics::ApplyDamage(OtherActor, DashDamage, GetController(), this, nullptr);
 }

@@ -23,14 +23,22 @@ private:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Input, meta = (AllowPrivateAccess = "true"));
 	class UInputAction* FireAction;
 
-	class UWizzardHUD* WizzardHUD;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Input, meta = (AllowPrivateAccess = "true"));
+	class UInputAction* DashAction;
 
+	// Initial Setup
+	class UWizzardHUD* WizzardHUD;
 	FVector CursorWorldLocation;
 
-	// Combat
+	// Projectile
 	bool bIsFiring = false;
-
 	float FireCurrentCooldown = 0.0f;
+
+	// Dash
+	bool bIsDashing = false;
+	FVector DashStart;
+	FVector DashTarget;
+	float DashElapsedTime = 0.f;
 
 protected:
 	// Called when the game starts or when spawned
@@ -47,15 +55,31 @@ protected:
 
 	void Die();
 
-	void TakeDamage(float DamageAmount);
+	virtual float TakeDamage(float Damage, const FDamageEvent& DamageEvent, AController* EventInstigator, AActor* DamageCauser) override;
+
+	void OnDashOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
 
 public:
+	// PROPERTIES
+	// Camera Components
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Components);
 	class UCameraComponent* CameraComp;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Components);
 	class USpringArmComponent* SpringArmComp;
 
+	// Mesh Related
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Mesh);
+	FRotator MeshRotationOffset = FRotator(0.0f, -90.0f, 0.0f);
+
+	// Stats
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Combat);
+	float CurrentHealth;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Combat);
+	float MaxHealth = 100.0f;
+
+	// Projectile
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Combat);
 	class USceneComponent* ProjectileSpawnPoint;
 	
@@ -65,20 +89,41 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Combat);
 	float FireCooldown = 1.0f;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Combat);
-	float CurrentHealth;
+	// Dash Ability
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Abilities")
+	class USphereComponent* DashCollisionSphere;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Combat);
-	float MaxHealth = 100.0f;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Abilities")
+	float DashDistance = 1000.0f;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Mesh);
-	FRotator MeshRotationOffset = FRotator(0.0f, -90.0f, 0.0f);
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Abilities")
+	float DashDuration = 0.2f;
 
-	// Called every frame
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Abilities")
+	float DashDamage = 20.0f;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Abilities")
+	float DashDamageRadius = 150.0f;
+
+	// FUNCTIONS
+	// Utility
 	virtual void Tick(float DeltaTime) override;
 
+	UFUNCTION(BlueprintCallable, Category="Utilities")
+	FVector GetMeshForwardVector() const;
+
+	// Setters
+	UFUNCTION()
 	void SetHUDReference(UWizzardHUD* HUD);
 
+	// Getters
+	UFUNCTION()
+	float GetCurrentHealth();
+
+	UFUNCTION()
+	float GetMaxHealth();
+
+	// Projectile
 	UFUNCTION()
 	void ShootProjectile();
 
@@ -87,4 +132,11 @@ public:
 
 	UFUNCTION()
 	void StopFiring();
+
+	// Dash
+	UFUNCTION()
+	void StartDash();
+
+	UFUNCTION()
+	void HandleDash(float DeltaTime);
 };
