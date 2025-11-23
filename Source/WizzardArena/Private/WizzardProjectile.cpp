@@ -25,6 +25,8 @@ AWizzardProjectile::AWizzardProjectile()
 	ProjectileMovement->MaxSpeed = 2000.f;
 	ProjectileMovement->bRotationFollowsVelocity = true;
 	ProjectileMovement->ProjectileGravityScale = 0.f;
+
+	
 }
 
 // Called when the game starts or when spawned
@@ -63,5 +65,15 @@ void AWizzardProjectile::OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor,
 	UGameplayStatics::ApplyDamage(OtherActor, Damage, GetInstigatorController(), this, nullptr);
 
 	Destroy();
+}
+
+void AWizzardProjectile::SetDamage(float InDamage)
+{
+	Damage = InDamage;
+}
+
+void AWizzardProjectile::SetProjectileOwner(AActor* InOwner)
+{
+	ProjectileOwner = InOwner;
 }
 

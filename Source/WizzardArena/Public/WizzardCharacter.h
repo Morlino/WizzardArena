@@ -5,10 +5,11 @@
 #include "CoreMinimal.h"
 #include "InputActionValue.h"
 #include "GameFramework/Character.h"
+#include "BaseCharacter.h"
 #include "WizzardCharacter.generated.h"
 
 UCLASS()
-class WIZZARDARENA_API AWizzardCharacter : public ACharacter
+class WIZZARDARENA_API AWizzardCharacter : public ABaseCharacter
 {
 	GENERATED_BODY()
 
@@ -44,7 +45,8 @@ protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
-	void InitHUD();
+	UFUNCTION()
+	void UpdateHealthHUD(float NewHealth, float NewMaxHealth);
 
 	void Move(const FInputActionValue& Value);
 
@@ -52,10 +54,6 @@ protected:
 
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
-
-	void Die();
-
-	virtual float TakeDamage(float Damage, const FDamageEvent& DamageEvent, AController* EventInstigator, AActor* DamageCauser) override;
 
 	void OnDashOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
 
@@ -71,13 +69,6 @@ public:
 	// Mesh Related
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Mesh);
 	FRotator MeshRotationOffset = FRotator(0.0f, -90.0f, 0.0f);
-
-	// Stats
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Combat);
-	float CurrentHealth;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Combat);
-	float MaxHealth = 100.0f;
 
 	// Projectile
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Combat);
@@ -115,13 +106,6 @@ public:
 	// Setters
 	UFUNCTION()
 	void SetHUDReference(UWizzardHUD* HUD);
-
-	// Getters
-	UFUNCTION()
-	float GetCurrentHealth();
-
-	UFUNCTION()
-	float GetMaxHealth();
 
 	// Projectile
 	UFUNCTION()

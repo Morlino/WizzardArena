@@ -8,6 +8,7 @@
 #include "EnhancedInputComponent.h"
 #include "WizzardHUD.h"
 #include "WizzardPlayerController.h"
+#include "WizzardProjectile.h"
 #include "Components/SphereComponent.h"
 #include "Kismet/GameplayStatics.h"
 
@@ -27,9 +28,6 @@ AWizzardCharacter::AWizzardCharacter()
 	CameraComp = CreateDefaultSubobject<UCameraComponent>(TEXT("Camera"));
 	CameraComp->SetupAttachment(SpringArmComp);
 
-	// Stats
-	CurrentHealth = MaxHealth;
-
 	// Projectile
 	ProjectileSpawnPoint = CreateDefaultSubobject<USceneComponent>(TEXT("ProjectileSpawnPoint"));
 	ProjectileSpawnPoint->SetupAttachment(GetMesh());
@@ -48,21 +46,20 @@ AWizzardCharacter::AWizzardCharacter()
 void AWizzardCharacter::BeginPlay()
 {
 	Super::BeginPlay();
-	
+
+	OnHealthChanged.AddDynamic(this, &AWizzardCharacter::UpdateHealthHUD);
 }
 
-void AWizzardCharacter::InitHUD()
+void AWizzardCharacter::UpdateHealthHUD(float NewHealth, float NewMaxHealth)
 {
-	// Set starting health
-	WizzardHUD->SetHealth(CurrentHealth, MaxHealth);
+	UE_LOG(LogTemp, Log, TEXT("Delegate fired! New Health=%f"), NewHealth);
+
+	WizzardHUD->SetHealth(NewHealth, NewMaxHealth);
 }
 
 void AWizzardCharacter::Move(const FInputActionValue& Value)
 {
 	FVector2D MovementVector = Value.Get<FVector2D>();
-
-	// Log the input values
-	UE_LOG(LogTemp, Log, TEXT("Move Input: X=%.2f, Y=%.2f"), MovementVector.X, MovementVector.Y);
 
 	AddMovementInput(GetActorRightVector(), MovementVector.X);
 	AddMovementInput(GetActorForwardVector(), MovementVector.Y);
@@ -143,16 +140,6 @@ void AWizzardCharacter::SetHUDReference(UWizzardHUD* HUD)
 	}
 }
 
-float AWizzardCharacter::GetCurrentHealth()
-{
-	return CurrentHealth;
-}
-
-float AWizzardCharacter::GetMaxHealth()
-{
-	return MaxHealth;
-}
-
 void AWizzardCharacter::ShootProjectile()
 {
 	if (!ProjectileClass) return;
@@ -167,7 +154,14 @@ void AWizzardCharacter::ShootProjectile()
 	SpawnParams.Owner = this;
 	SpawnParams.Instigator = GetInstigator();
 
-	GetWorld()->SpawnActor<AActor>(ProjectileClass, SpawnLocation, SpawnRotation, SpawnParams);
+	AWizzardProjectile* Projectile = GetWorld()->SpawnActor<AWizzardProjectile>(ProjectileClass, SpawnLocation, SpawnRotation, SpawnParams);
+
+	if (Projectile)
+	{
+		// Set projectile damage from character
+		Projectile->SetDamage(Damage);  
+		Projectile->SetProjectileOwner(this);  
+	}
 
 	UE_LOG(LogTemp, Log, TEXT("Projectile spawned at %s"), *SpawnLocation.ToString());
 }
@@ -216,8 +210,6 @@ void AWizzardCharacter::StartDash()
 
 void AWizzardCharacter::HandleDash(float DeltaTime)
 {
-	UE_LOG(LogTemp, Log, TEXT("HandleDash"));
-
 	DashElapsedTime += DeltaTime;
 	float Alpha = FMath::Clamp(DashElapsedTime / DashDuration, 0.0f, 1.0f);
 
@@ -250,31 +242,6 @@ void AWizzardCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCo
 		// Dash
 		EnhancedInputComponent->BindAction(DashAction, ETriggerEvent::Triggered, this, &AWizzardCharacter::StartDash);
 	}
-}
-
-void AWizzardCharacter::Die()
-{
-	UE_LOG(LogTemp, Log, TEXT("You Died"));
-
-	Destroy();
-}
-
-float AWizzardCharacter::TakeDamage(float Damage, const FDamageEvent& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
-{
-	float ActualDamage = FMath::Clamp(Damage, 0.f, MaxHealth);
-	CurrentHealth -= ActualDamage;
-
-	if (WizzardHUD)
-	{
-		WizzardHUD->SetHealth(CurrentHealth, MaxHealth);
-	}
-
-	if (CurrentHealth <= 0.f)
-	{
-		Die();
-	}
-
-	return ActualDamage;
 }
 
 void AWizzardCharacter::OnDashOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,

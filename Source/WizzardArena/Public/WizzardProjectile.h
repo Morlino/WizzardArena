@@ -15,6 +15,9 @@ public:
 	// Sets default values for this actor's properties
 	AWizzardProjectile();
 
+private:
+	float Damage;
+
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
@@ -29,9 +32,8 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Components)
 	class UProjectileMovementComponent* ProjectileMovement;
 
-	// Damage (optional)
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Combat")
-	float Damage = 10.f;
+	UPROPERTY(BlueprintReadWrite)
+	AActor* ProjectileOwner;
 
 	// Particle effect on impact
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Effects")
@@ -40,4 +42,6 @@ public:
 	// Hit handling
 	UFUNCTION()
 	void OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit);
+	void SetDamage(float InDamage);
+	void SetProjectileOwner(AActor* InOwner);
 };
