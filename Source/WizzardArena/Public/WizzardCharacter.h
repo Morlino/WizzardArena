@@ -33,13 +33,17 @@ private:
 
 	// Projectile
 	bool bIsFiring = false;
+	bool bCanFire = true;
 	float FireCurrentCooldown = 0.0f;
+	FTimerHandle FireCooldownTimer;
 
 	// Dash
 	bool bIsDashing = false;
 	FVector DashStart;
 	FVector DashTarget;
 	float DashElapsedTime = 0.f;
+	FTimerHandle DashCooldownTimer;
+	bool bCanDash = true;
 
 protected:
 	// Called when the game starts or when spawned
@@ -96,6 +100,9 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Abilities")
 	float DashDamageRadius = 150.0f;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Dash")
+	float DashCooldown = 15.0f;
+
 	// FUNCTIONS
 	// Utility
 	virtual void Tick(float DeltaTime) override;
@@ -117,9 +124,18 @@ public:
 	UFUNCTION()
 	void StopFiring();
 
+	UFUNCTION()
+	void TryFire();
+
+	UFUNCTION()
+	void ResetFireCooldown();
+	
 	// Dash
 	UFUNCTION()
 	void StartDash();
+
+	UFUNCTION()
+	void ResetDashCooldown();
 
 	UFUNCTION()
 	void HandleDash(float DeltaTime);

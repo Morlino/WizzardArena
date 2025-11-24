@@ -110,15 +110,6 @@ void AWizzardCharacter::Tick(float DeltaTime)
 		HandleDash(DeltaTime);
 	}
 
-	if (bIsFiring)
-	{
-		if (FireCurrentCooldown <= 0.0f)
-		{
-			ShootProjectile();
-			FireCurrentCooldown = FireCooldown;
-		}
-	}
-
 	RotateToCursor();
 }
 
@@ -170,6 +161,8 @@ void AWizzardCharacter::StartFiring()
 {
 	UE_LOG(LogTemp, Log, TEXT("StartFiring"));
 	bIsFiring = true;
+
+	TryFire();
 }
 
 void AWizzardCharacter::StopFiring()
@@ -178,11 +171,48 @@ void AWizzardCharacter::StopFiring()
 	bIsFiring = false;
 }
 
+void AWizzardCharacter::TryFire()
+{
+	if (!bIsFiring || !bCanFire) return;
+
+	ShootProjectile();
+
+	// Start cooldown
+	bCanFire = false;
+
+	GetWorldTimerManager().SetTimer(
+	FireCooldownTimer,
+	this,
+	&AWizzardCharacter::ResetFireCooldown,
+	FireCooldown,
+	false
+);
+}
+
+void AWizzardCharacter::ResetFireCooldown()
+{
+	bCanFire = true;
+
+	// If the player is still holding fire, shoot again
+	TryFire();
+}
+
 void AWizzardCharacter::StartDash()
 {
-	if (bIsDashing) return;
+	if (!bCanDash || bIsDashing) return;
 
 	UE_LOG(LogTemp, Log, TEXT("StartDash"));
+
+	bCanDash = false;
+
+	// Start cooldown timer
+	GetWorldTimerManager().SetTimer(
+		DashCooldownTimer,
+		this,
+		&AWizzardCharacter::ResetDashCooldown,
+		DashCooldown,
+		false
+	);
 
 	FVector DashDir = FVector::ZeroVector;
 
@@ -206,6 +236,12 @@ void AWizzardCharacter::StartDash()
 
 	// Enable dash collision
 	DashCollisionSphere->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
+}
+
+void AWizzardCharacter::ResetDashCooldown()
+{
+	bCanDash = true;
+	UE_LOG(LogTemp, Log, TEXT("Dash Ready!"));
 }
 
 void AWizzardCharacter::HandleDash(float DeltaTime)
