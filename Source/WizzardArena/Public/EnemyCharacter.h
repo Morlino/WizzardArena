@@ -26,6 +26,8 @@ private:
 	bool bIsMovingToTarget = false;
 
 public:
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "HealthWidget")
+	class UWidgetComponent* HealthWidgetComponent;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Combat")
 	UAnimMontage* AttackMontage;
@@ -42,6 +44,11 @@ public:
 	UFUNCTION(BlueprintCallable, Category="Combat")
 	void Attack(AActor* TargetActor);
 
+	void BeginPlay();
+
+	UFUNCTION()
+	void UpdateHealthWidget(float NewHealth, float NewMaxHealth);
+	
 	UFUNCTION()
 	void ResetAttack();
 

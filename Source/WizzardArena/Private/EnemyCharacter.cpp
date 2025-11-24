@@ -3,8 +3,10 @@
 
 #include "EnemyCharacter.h"
 #include "EnemyAIController.h"
+#include "WizzardHealthWidget.h"
 #include "Kismet/GameplayStatics.h"
 #include "Animation/AnimMontage.h"
+#include "Components/WidgetComponent.h"
 
 AEnemyCharacter::AEnemyCharacter()
 {
@@ -12,6 +14,35 @@ AEnemyCharacter::AEnemyCharacter()
 
 	AutoPossessAI = EAutoPossessAI::PlacedInWorldOrSpawned;
 	AIControllerClass = AEnemyAIController::StaticClass();
+
+	HealthWidgetComponent = CreateDefaultSubobject<UWidgetComponent>(TEXT("HealthWidget"));
+	HealthWidgetComponent->SetupAttachment(RootComponent);
+
+	HealthWidgetComponent->SetWidgetSpace(EWidgetSpace::Screen);
+	HealthWidgetComponent->SetDrawAtDesiredSize(true);
+
+	HealthWidgetComponent->SetRelativeLocation(FVector(0.f, 0.f, 120.f));
+	HealthWidgetComponent->SetDrawSize(FVector2D(150.f, 20.f));
+
+}
+
+void AEnemyCharacter::BeginPlay()
+{
+	Super::BeginPlay();
+
+	OnHealthChanged.AddDynamic(this, &AEnemyCharacter::UpdateHealthWidget);
+}
+
+void AEnemyCharacter::UpdateHealthWidget(float NewHealth, float NewMaxHealth)
+{
+    if (!HealthWidgetComponent) return;
+
+    UWizzardHealthWidget* HealthWidget = Cast<UWizzardHealthWidget>(HealthWidgetComponent->GetUserWidgetObject());
+
+    if (HealthWidget)
+    {
+        HealthWidget->SetHealth(NewHealth, NewMaxHealth);
+    }
 }
 
 void AEnemyCharacter::Attack(AActor* TargetActor)
