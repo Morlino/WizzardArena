@@ -18,6 +18,8 @@ public:
 private:
 	float Damage;
 
+	float PushStrength;
+
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
@@ -43,5 +45,8 @@ public:
 	UFUNCTION()
 	void OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit);
 	void SetDamage(float InDamage);
+	void SetPushStrength(float InPushStrength);
 	void SetProjectileOwner(AActor* InOwner);
+
+	void ApplyPushBack(AActor* OtherActor, UPrimitiveComponent* OtherComp);
 };

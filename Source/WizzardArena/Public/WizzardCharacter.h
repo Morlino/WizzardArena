@@ -64,24 +64,27 @@ protected:
 public:
 	// PROPERTIES
 	// Camera Components
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Components);
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Components)
 	class UCameraComponent* CameraComp;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Components);
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Components)
 	class USpringArmComponent* SpringArmComp;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Camera)
+	float TargetArmLength = 1800.0f;
+
 	// Mesh Related
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Mesh);
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Mesh)
 	FRotator MeshRotationOffset = FRotator(0.0f, -90.0f, 0.0f);
 
 	// Projectile
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Combat);
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Combat)
 	class USceneComponent* ProjectileSpawnPoint;
 	
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Combat);
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Combat)
 	TSubclassOf<AActor> ProjectileClass;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Combat);
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Combat)
 	float FireCooldown = 1.0f;
 
 	// Dash Ability
@@ -101,7 +104,7 @@ public:
 	float DashDamageRadius = 150.0f;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Dash")
-	float DashCooldown = 15.0f;
+	float DashCooldown = 5.0f;
 
 	// FUNCTIONS
 	// Utility

@@ -22,7 +22,7 @@ AWizzardCharacter::AWizzardCharacter()
 	SpringArmComp = CreateDefaultSubobject<USpringArmComponent>(TEXT("SpringArm"));
 	SpringArmComp->SetupAttachment(RootComponent);
 	SpringArmComp->SetRelativeRotation(FRotator(-60.0f, 0.0f, 0.0f));
-	SpringArmComp->TargetArmLength = 800.0f;
+	SpringArmComp->TargetArmLength = TargetArmLength;
 	SpringArmComp->bDoCollisionTest = false;
 
 	CameraComp = CreateDefaultSubobject<UCameraComponent>(TEXT("Camera"));
@@ -150,7 +150,8 @@ void AWizzardCharacter::ShootProjectile()
 	if (Projectile)
 	{
 		// Set projectile damage from character
-		Projectile->SetDamage(Damage);  
+		Projectile->SetDamage(Damage);
+		Projectile->SetPushStrength(PushStrength);
 		Projectile->SetProjectileOwner(this);  
 	}
 

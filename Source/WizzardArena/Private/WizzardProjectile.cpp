@@ -5,6 +5,7 @@
 #include "GameFramework/ProjectileMovementComponent.h"
 #include "Kismet/GameplayStatics.h"
 #include "NiagaraFunctionLibrary.h"
+#include "GameFramework/Character.h"
 
 // Sets default values
 AWizzardProjectile::AWizzardProjectile()
@@ -44,6 +45,25 @@ void AWizzardProjectile::Tick(float DeltaTime)
 
 }
 
+void AWizzardProjectile::ApplyPushBack(AActor* OtherActor, UPrimitiveComponent* OtherComp)
+{
+	FVector PushDirection = OtherActor->GetActorLocation() - GetActorLocation();
+	PushDirection.Z = 0;
+	PushDirection.Normalize();
+
+	// Option 1: If hit component simulates physics
+	if (OtherComp && OtherComp->IsSimulatingPhysics())
+	{
+		OtherComp->AddImpulse(PushDirection * PushStrength, NAME_None, true);
+	}
+	else if (ACharacter* HitCharacter = Cast<ACharacter>(OtherActor))
+	{
+		// Option 2: For characters without physics
+		FVector LaunchVelocity = PushDirection * PushStrength;
+		HitCharacter->LaunchCharacter(LaunchVelocity, true, true);
+	}
+}
+
 void AWizzardProjectile::OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit)
 {
 	if (!OtherActor || OtherActor == GetOwner())
@@ -64,12 +84,19 @@ void AWizzardProjectile::OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor,
 	// Apply damage
 	UGameplayStatics::ApplyDamage(OtherActor, Damage, GetInstigatorController(), this, nullptr);
 
+	ApplyPushBack(OtherActor, OtherComp);
+
 	Destroy();
 }
 
 void AWizzardProjectile::SetDamage(float InDamage)
 {
 	Damage = InDamage;
+}
+
+void AWizzardProjectile::SetPushStrength(float InPushStrength)
+{
+	PushStrength = InPushStrength;
 }
 
 void AWizzardProjectile::SetProjectileOwner(AActor* InOwner)

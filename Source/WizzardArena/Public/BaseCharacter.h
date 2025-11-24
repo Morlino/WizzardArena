@@ -45,6 +45,9 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Stats")
 	float Damage = 20.0f;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Abilities")
+	float PushStrength = 1000.0f;
+
 	// Getters
 	UFUNCTION()
 	float GetCurrentHealth();
