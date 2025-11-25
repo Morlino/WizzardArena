@@ -37,6 +37,9 @@ public:
 	UPROPERTY(BlueprintReadWrite)
 	AActor* ProjectileOwner;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Effects")
+	class UNiagaraComponent* ProjectileVFX;
+
 	// Particle effect on impact
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Effects")
 	class UNiagaraSystem* HitEffect;

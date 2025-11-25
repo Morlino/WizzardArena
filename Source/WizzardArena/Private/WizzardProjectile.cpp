@@ -6,6 +6,7 @@
 #include "Kismet/GameplayStatics.h"
 #include "NiagaraFunctionLibrary.h"
 #include "GameFramework/Character.h"
+#include "NiagaraComponent.h"
 
 // Sets default values
 AWizzardProjectile::AWizzardProjectile()
@@ -27,13 +28,20 @@ AWizzardProjectile::AWizzardProjectile()
 	ProjectileMovement->bRotationFollowsVelocity = true;
 	ProjectileMovement->ProjectileGravityScale = 0.f;
 
-	
+	ProjectileVFX = CreateDefaultSubobject<UNiagaraComponent>(TEXT("ProjectileVFX"));
+	ProjectileVFX->SetupAttachment(ProjectileMesh);
+	ProjectileVFX->bAutoActivate = true;
 }
 
 // Called when the game starts or when spawned
 void AWizzardProjectile::BeginPlay()
 {
 	Super::BeginPlay();
+
+	if (AActor* InstigatorActor = GetInstigator())
+	{
+		ProjectileMesh->IgnoreActorWhenMoving(InstigatorActor, true);
+	}
 
 	ProjectileMesh->OnComponentHit.AddDynamic(this, &AWizzardProjectile::OnHit);
 }

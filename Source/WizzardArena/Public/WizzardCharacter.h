@@ -53,8 +53,10 @@ protected:
 	void UpdateHealthHUD(float NewHealth, float NewMaxHealth);
 
 	void Move(const FInputActionValue& Value);
+	void UpdateCursorWorldLocation();
 
 	void RotateToCursor();
+	void RototatePlayerToCursor();
 
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
@@ -109,9 +111,6 @@ public:
 	// FUNCTIONS
 	// Utility
 	virtual void Tick(float DeltaTime) override;
-
-	UFUNCTION(BlueprintCallable, Category="Utilities")
-	FVector GetMeshForwardVector() const;
 
 	// Setters
 	UFUNCTION()

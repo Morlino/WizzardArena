@@ -10,7 +10,9 @@
 #include "WizzardPlayerController.h"
 #include "WizzardProjectile.h"
 #include "Components/SphereComponent.h"
+#include "EntitySystem/MovieSceneEntitySystemRunner.h"
 #include "Kismet/GameplayStatics.h"
+#include "Kismet/KismetMathLibrary.h"
 
 // Sets default values
 AWizzardCharacter::AWizzardCharacter()
@@ -24,9 +26,13 @@ AWizzardCharacter::AWizzardCharacter()
 	SpringArmComp->SetRelativeRotation(FRotator(-60.0f, 0.0f, 0.0f));
 	SpringArmComp->TargetArmLength = TargetArmLength;
 	SpringArmComp->bDoCollisionTest = false;
+	SpringArmComp->bEnableCameraLag = true;
+	SpringArmComp->CameraLagSpeed = 0.5f;
+	SpringArmComp->bInheritYaw = false;
 
 	CameraComp = CreateDefaultSubobject<UCameraComponent>(TEXT("Camera"));
 	CameraComp->SetupAttachment(SpringArmComp);
+	CameraComp->FieldOfView = 75.0f;
 
 	// Projectile
 	ProjectileSpawnPoint = CreateDefaultSubobject<USceneComponent>(TEXT("ProjectileSpawnPoint"));
@@ -61,11 +67,24 @@ void AWizzardCharacter::Move(const FInputActionValue& Value)
 {
 	FVector2D MovementVector = Value.Get<FVector2D>();
 
-	AddMovementInput(GetActorRightVector(), MovementVector.X);
-	AddMovementInput(GetActorForwardVector(), MovementVector.Y);
+	APlayerController* PC = Cast<APlayerController>(GetController());
+	if (!PC) return;
+
+	FRotator ControlRot = PC->GetControlRotation();
+	// Flatten pitch to prevent movement going up/down
+	ControlRot.Pitch = 0.f;
+
+	// Convert to forward/right vectors
+	const FVector Forward = UKismetMathLibrary::GetForwardVector(ControlRot);
+	const FVector Right   = UKismetMathLibrary::GetRightVector(ControlRot);
+
+	// Apply movement
+	AddMovementInput(Forward, MovementVector.Y); // W/S
+	AddMovementInput(Right, MovementVector.X);   // A/D
 }
 
-void AWizzardCharacter::RotateToCursor()
+
+void AWizzardCharacter::UpdateCursorWorldLocation()
 {
 	APlayerController* PC = Cast<APlayerController>(GetController());
 	if (!PC) return;
@@ -73,27 +92,36 @@ void AWizzardCharacter::RotateToCursor()
 	FVector WorldLocation, WorldDirection;
 	if (PC->DeprojectMousePositionToWorld(WorldLocation, WorldDirection))
 	{
-		FVector PlaneIntersection = FMath::LinePlaneIntersection(
+		// Intersect with plane at character Z
+		CursorWorldLocation = FMath::LinePlaneIntersection(
 			WorldLocation,
-			WorldLocation + WorldDirection * 1000.0f,
+			WorldLocation + WorldDirection * 10000.0f,
 			FVector(0.0f, 0.0f, GetActorLocation().Z),
 			FVector::UpVector
 		);
+	}
+}
 
-		// Save cursor location
-		CursorWorldLocation = PlaneIntersection;
+void AWizzardCharacter::RototatePlayerToCursor()
+{
+	FHitResult Hit;
+	APlayerController* PC = GetWorld()->GetFirstPlayerController();
+	if (!PC) return;
 
-		FVector LookDir = PlaneIntersection - GetActorLocation();
-		LookDir.Z = 0.0f;
+	// Convert ECC to ETraceTypeQuery for this function
+	ETraceTypeQuery TraceType = UEngineTypes::ConvertToTraceType(ECC_Visibility);
 
-		if (!LookDir.IsNearlyZero())
-		{
-			FRotator TargetRotation = LookDir.Rotation();
-			TargetRotation.Pitch = 0.f;
-			TargetRotation.Roll = 0.f;
-			FRotator MeshOffset(MeshRotationOffset);
-			GetMesh()->SetWorldRotation(TargetRotation + MeshOffset);
-		}
+	// This calls the real function you referenced
+	if (PC->GetHitResultUnderCursorByChannel(TraceType, true, Hit))
+	{
+		FRotator LookRot = UKismetMathLibrary::FindLookAtRotation(GetActorLocation(), Hit.Location);
+
+		FRotator NewRotation(GetActorRotation().Pitch, LookRot.Yaw, GetActorRotation().Roll);
+		UE_LOG(LogTemp, Warning, TEXT("NewRotation = Pitch: %f  Yaw: %f  Roll: %f"),
+			NewRotation.Pitch,
+			NewRotation.Yaw,
+			NewRotation.Roll);
+		SetActorRotation(NewRotation);
 	}
 }
 
@@ -110,14 +138,9 @@ void AWizzardCharacter::Tick(float DeltaTime)
 		HandleDash(DeltaTime);
 	}
 
-	RotateToCursor();
-}
-
-FVector AWizzardCharacter::GetMeshForwardVector() const
-{
-	FRotator MeshRot = GetMesh()->GetComponentRotation() - MeshRotationOffset;
-
-	return MeshRot.Vector();
+	// RotateToCursor();
+	UpdateCursorWorldLocation();
+	RototatePlayerToCursor();
 }
 
 void AWizzardCharacter::SetHUDReference(UWizzardHUD* HUD)
@@ -227,7 +250,7 @@ void AWizzardCharacter::StartDash()
 	}
 	else
 	{
-		DashDir = GetMeshForwardVector();
+		DashDir = GetActorForwardVector();
 	}
 
 	DashStart = GetActorLocation();
