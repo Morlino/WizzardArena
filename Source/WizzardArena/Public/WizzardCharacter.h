@@ -66,10 +66,10 @@ protected:
 public:
 	// PROPERTIES
 	// Camera Components
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Components)
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components", meta=(AllowPrivateAccess="true"))
 	class UCameraComponent* CameraComp;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Components)
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components", meta=(AllowPrivateAccess="true"))
 	class USpringArmComponent* SpringArmComp;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Camera)

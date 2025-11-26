@@ -10,7 +10,6 @@
 #include "WizzardPlayerController.h"
 #include "WizzardProjectile.h"
 #include "Components/SphereComponent.h"
-#include "EntitySystem/MovieSceneEntitySystemRunner.h"
 #include "Kismet/GameplayStatics.h"
 #include "Kismet/KismetMathLibrary.h"
 
@@ -27,7 +26,7 @@ AWizzardCharacter::AWizzardCharacter()
 	SpringArmComp->TargetArmLength = TargetArmLength;
 	SpringArmComp->bDoCollisionTest = false;
 	SpringArmComp->bEnableCameraLag = true;
-	SpringArmComp->CameraLagSpeed = 0.5f;
+	SpringArmComp->CameraLagSpeed = 2.0f;
 	SpringArmComp->bInheritYaw = false;
 
 	CameraComp = CreateDefaultSubobject<UCameraComponent>(TEXT("Camera"));
