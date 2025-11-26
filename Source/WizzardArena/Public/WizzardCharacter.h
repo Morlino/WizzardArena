@@ -86,8 +86,11 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Combat)
 	TSubclassOf<AActor> ProjectileClass;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Combat)
-	float FireCooldown = 1.0f;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Combat")
+	class UAnimMontage* CastAnimation;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Combat")
+	float ProjectileCastTime = 0.6f;
 
 	// Dash Ability
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Abilities")
@@ -119,6 +122,7 @@ public:
 	// Projectile
 	UFUNCTION()
 	void ShootProjectile();
+	void PlayCastMontageIfPossible();
 
 	UFUNCTION()
 	void StartFiring();
@@ -131,7 +135,7 @@ public:
 
 	UFUNCTION()
 	void ResetFireCooldown();
-	
+
 	// Dash
 	UFUNCTION()
 	void StartDash();

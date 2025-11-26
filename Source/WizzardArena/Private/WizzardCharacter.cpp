@@ -181,10 +181,26 @@ void AWizzardCharacter::ShootProjectile()
 	UE_LOG(LogTemp, Log, TEXT("Projectile spawned at %s"), *SpawnLocation.ToString());
 }
 
+void AWizzardCharacter::PlayCastMontageIfPossible()
+{
+	if (!CastAnimation) return;
+
+	UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
+	if (!AnimInstance) return;
+
+	// Play only if not already playing
+	if (!AnimInstance->Montage_IsPlaying(CastAnimation))
+	{
+		float Speed = CastAnimation->GetPlayLength() / ProjectileCastTime;
+		PlayAnimMontage(CastAnimation, Speed);
+	}
+}
+
 void AWizzardCharacter::StartFiring()
 {
-	UE_LOG(LogTemp, Log, TEXT("StartFiring"));
 	bIsFiring = true;
+
+	PlayCastMontageIfPossible();
 
 	TryFire();
 }
@@ -197,20 +213,22 @@ void AWizzardCharacter::StopFiring()
 
 void AWizzardCharacter::TryFire()
 {
-	if (!bIsFiring || !bCanFire) return;
+	if (!bIsFiring || !bCanFire)
+		return;
 
-	ShootProjectile();
-
-	// Start cooldown
 	bCanFire = false;
 
+	// If animation finished naturally before cooldown -> restart it
+	PlayCastMontageIfPossible();
+
+	// Start cooldown
 	GetWorldTimerManager().SetTimer(
-	FireCooldownTimer,
-	this,
-	&AWizzardCharacter::ResetFireCooldown,
-	FireCooldown,
-	false
-);
+		FireCooldownTimer,
+		this,
+		&AWizzardCharacter::ResetFireCooldown,
+		ProjectileCastTime,
+		false
+	);
 }
 
 void AWizzardCharacter::ResetFireCooldown()
