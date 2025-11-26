@@ -246,6 +246,18 @@ void AWizzardCharacter::StartDash()
 
 	bCanDash = false;
 
+	if (!DashAnimation) return;
+
+	UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
+	if (!AnimInstance) return;
+
+	// Play only if not already playing
+	if (!AnimInstance->Montage_IsPlaying(DashAnimation))
+	{
+		float Speed = DashAnimation->GetPlayLength() / DashDuration;
+		PlayAnimMontage(DashAnimation, Speed);
+	}
+
 	// Start cooldown timer
 	GetWorldTimerManager().SetTimer(
 		DashCooldownTimer,

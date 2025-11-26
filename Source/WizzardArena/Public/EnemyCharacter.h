@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "BaseCharacter.h"
+#include "ProjectileSpawnPoint.h"
 #include "EnemyCharacter.generated.h"
 
 /**
@@ -17,6 +18,7 @@ class WIZZARDARENA_API AEnemyCharacter : public ABaseCharacter
 public:
 	// Sets default values for this character's properties
 	AEnemyCharacter();
+	void CollectSetSpawnPoints();
 
 private:
 	FTimerHandle AttackTimerHandle;
@@ -41,20 +43,44 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Combat")
 	float AttackCooldown = 1.0f;
 
-	UFUNCTION(BlueprintCallable, Category="Combat")
-	void Attack(AActor* TargetActor);
+	// Projectile
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Combat")
+	TSubclassOf<AActor> ProjectileClass;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Combat")
+	TArray<UProjectileSpawnPoint*> ProjectileSpawnPoints;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Combat")
+	float ProjectileDamage = 10.0f;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Combat")
+	float ProjectilePushStrength = 500.f;
+
+	// FUNCTIONS
+	// Core
 	void BeginPlay();
 
 	UFUNCTION()
 	void UpdateHealthWidget(float NewHealth, float NewMaxHealth);
-	
-	UFUNCTION()
-	void ResetAttack();
 
+	// Movement
 	UFUNCTION(BlueprintCallable, Category="Combat")
 	void MoveToTarget(AActor* TargetActor);
 
 	UFUNCTION(BlueprintCallable, Category="Combat")
 	void StopMoving();
+
+	// Attack
+	UFUNCTION()
+	void ResetAttack();
+
+	UFUNCTION(BlueprintCallable, Category="Combat")
+	void Attack(AActor* TargetActor);
+
+	UFUNCTION(BlueprintCallable, Category="Combat")
+	void TraceAttack(float TraceRadius, FVector TraceOffset);
+
+	// Projectiles
+	UFUNCTION(BlueprintCallable, Category="Combat")
+	void ShootProjectiles();
 };

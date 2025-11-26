@@ -16,7 +16,10 @@ AWizzardProjectile::AWizzardProjectile()
 
 	// Projectile setup and collision
 	ProjectileMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("ProjectileMesh"));
-	ProjectileMesh->SetCollisionProfileName(TEXT("BlockAllDynamic"));
+	ProjectileMesh->SetCollisionObjectType(ECollisionChannel::ECC_GameTraceChannel1);
+	ProjectileMesh->SetCollisionResponseToAllChannels(ECollisionResponse::ECR_Block);
+	ProjectileMesh->SetCollisionResponseToChannel(ECC_GameTraceChannel1, ECR_Ignore);
+	
 	ProjectileMesh->SetNotifyRigidBodyCollision(true);
 
 	RootComponent = ProjectileMesh;
@@ -37,11 +40,6 @@ AWizzardProjectile::AWizzardProjectile()
 void AWizzardProjectile::BeginPlay()
 {
 	Super::BeginPlay();
-
-	if (AActor* InstigatorActor = GetInstigator())
-	{
-		ProjectileMesh->IgnoreActorWhenMoving(InstigatorActor, true);
-	}
 
 	ProjectileMesh->OnComponentHit.AddDynamic(this, &AWizzardProjectile::OnHit);
 }

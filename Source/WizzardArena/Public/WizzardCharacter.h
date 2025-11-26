@@ -108,8 +108,12 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Abilities")
 	float DashDamageRadius = 150.0f;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Dash")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Abilities")
 	float DashCooldown = 5.0f;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Abilities")
+	class UAnimMontage* DashAnimation;
+
 
 	// FUNCTIONS
 	// Utility
