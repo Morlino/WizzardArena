@@ -26,8 +26,8 @@ AWizzardProjectile::AWizzardProjectile()
 
 	// Movement on Spawn
 	ProjectileMovement = CreateDefaultSubobject<UProjectileMovementComponent>(TEXT("ProjectileMovement"));
-	ProjectileMovement->InitialSpeed = 2000.f;
-	ProjectileMovement->MaxSpeed = 2000.f;
+	ProjectileMovement->InitialSpeed = ProjectileSpeed;
+	ProjectileMovement->MaxSpeed = ProjectileSpeed;
 	ProjectileMovement->bRotationFollowsVelocity = true;
 	ProjectileMovement->ProjectileGravityScale = 0.f;
 
@@ -103,6 +103,20 @@ void AWizzardProjectile::SetDamage(float InDamage)
 void AWizzardProjectile::SetPushStrength(float InPushStrength)
 {
 	PushStrength = InPushStrength;
+}
+
+void AWizzardProjectile::SetProjectileSpeed(float InProjectileSpeed)
+{
+	ProjectileSpeed = InProjectileSpeed;
+
+	if (ProjectileMovement)
+	{
+		ProjectileMovement->InitialSpeed = ProjectileSpeed;
+		ProjectileMovement->MaxSpeed = ProjectileSpeed;
+
+		// If projectile already moved, update its velocity
+		ProjectileMovement->Velocity = ProjectileMovement->Velocity.GetSafeNormal() * ProjectileSpeed;
+	}
 }
 
 void AWizzardProjectile::SetProjectileOwner(AActor* InOwner)

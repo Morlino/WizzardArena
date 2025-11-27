@@ -155,6 +155,41 @@ void AEnemyCharacter::TraceAttack(float TraceRadius, FVector TraceOffset)
 	}
 }
 
+void AEnemyCharacter::ProjectileAttack()
+{
+	if (!bCanProjectileAttack)
+		return;
+
+	if (!ProjectileMontage)
+		return;
+
+	UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
+	if (!AnimInstance)
+		return;
+
+	// Start cooldown
+	bCanProjectileAttack = false;
+
+	GetWorldTimerManager().SetTimer(
+		ProjectileCooldownTimer,
+		this,
+		&AEnemyCharacter::ResetProjectileCooldown,
+		ProjectileCooldown,
+		false
+	);
+
+	// Play animation only if not already playing
+	if (!AnimInstance->Montage_IsPlaying(ProjectileMontage))
+	{
+		PlayAnimMontage(ProjectileMontage);
+	}
+}
+
+void AEnemyCharacter::ResetProjectileCooldown()
+{
+	bCanProjectileAttack = true;
+}
+
 void AEnemyCharacter::ShootProjectiles()
 {
 	UE_LOG(LogTemp, Log, TEXT("ShootProjectiles called!"));
@@ -197,6 +232,7 @@ void AEnemyCharacter::ShootProjectiles()
 		if (auto EnemyProjectile = Cast<AWizzardProjectile>(Projectile))
 		{
 			EnemyProjectile->SetDamage(Damage);
+			EnemyProjectile->SetProjectileSpeed(ProjectileSpeed);
 			EnemyProjectile->SetPushStrength(PushStrength);
 			EnemyProjectile->SetProjectileOwner(this);
 		}

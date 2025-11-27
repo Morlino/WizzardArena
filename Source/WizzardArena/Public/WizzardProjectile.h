@@ -43,12 +43,15 @@ public:
 	// Particle effect on impact
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Effects")
 	class UNiagaraSystem* HitEffect;
+
+	float ProjectileSpeed = 2000.0f;
 	
 	// Hit handling
 	UFUNCTION()
 	void OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit);
 	void SetDamage(float InDamage);
 	void SetPushStrength(float InPushStrength);
+	void SetProjectileSpeed(float InProjectileSpeed);
 	void SetProjectileOwner(AActor* InOwner);
 
 	void ApplyPushBack(AActor* OtherActor, UPrimitiveComponent* OtherComp);

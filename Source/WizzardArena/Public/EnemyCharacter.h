@@ -27,6 +27,10 @@ private:
 
 	bool bIsMovingToTarget = false;
 
+	FTimerHandle ProjectileCooldownTimer;
+
+	bool bCanProjectileAttack = true;
+
 public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "HealthWidget")
 	class UWidgetComponent* HealthWidgetComponent;
@@ -47,11 +51,20 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Combat")
 	TSubclassOf<AActor> ProjectileClass;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Combat")
+	UAnimMontage* ProjectileMontage;
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Combat")
 	TArray<UProjectileSpawnPoint*> ProjectileSpawnPoints;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Combat")
+	float ProjectileCooldown = 2.0f;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Combat")
 	float ProjectileDamage = 10.0f;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Combat")
+	float ProjectileSpeed = 1000.0f;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Combat")
 	float ProjectilePushStrength = 500.f;
@@ -79,8 +92,12 @@ public:
 
 	UFUNCTION(BlueprintCallable, Category="Combat")
 	void TraceAttack(float TraceRadius, FVector TraceOffset);
-
+	
 	// Projectiles
 	UFUNCTION(BlueprintCallable, Category="Combat")
 	void ShootProjectiles();
+
+	UFUNCTION(BlueprintCallable, Category="Combat")
+	void ProjectileAttack();
+	void ResetProjectileCooldown();
 };
