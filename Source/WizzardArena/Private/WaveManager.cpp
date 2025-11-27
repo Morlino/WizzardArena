@@ -13,25 +13,32 @@ AWaveManager::AWaveManager()
 
 void AWaveManager::SpawnWaveEnemies()
 {
-	if (!EnemiesPerWave.IsValidIndex(CurrentWave - 1)) return;
-
-	int32 Count = EnemiesPerWave[CurrentWave - 1];
-	EnemiesRemaining = Count;
-
-	int32 NumSpawners = Spawners.Num();
-	if (NumSpawners == 0) return;
-
-	int32 BasePerSpawner = Count / NumSpawners;
-	int32 Remainder = Count % NumSpawners;
-
-	for (int32 i = 0; i < NumSpawners; i++)
+	if (!Waves.IsValidIndex(CurrentWave - 1))
 	{
-		if (Spawners[i])
+		UE_LOG(LogTemp, Error, TEXT("Wave isn't valid"));
+		return;
+	}
+
+	const FWaveDefinition& Wave = Waves[CurrentWave - 1];
+
+	// Calculate total enemies for tracking
+	EnemiesRemaining = 0;
+	for (const FEnemySpawnInfo& Info : Wave.Enemies)
+		EnemiesRemaining += Info.Count;
+
+	if (Spawners.Num() == 0) return;
+
+	int SpawnerIndex = 0;
+
+	for (const FEnemySpawnInfo& Info : Wave.Enemies)
+	{
+		for (int i = 0; i < Info.Count; i++)
 		{
-			int32 ToSpawn = BasePerSpawner;
-			if (i < Remainder) ToSpawn++;
-			if (ToSpawn > 0)
-				Spawners[i]->SpawnWave(ToSpawn);
+			AEnemySpawner* Spawner = Spawners[SpawnerIndex];
+			if (Spawner)
+				Spawner->SpawnSpecificEnemy(Info.EnemyClass);
+
+			SpawnerIndex = (SpawnerIndex + 1) % Spawners.Num();
 		}
 	}
 }

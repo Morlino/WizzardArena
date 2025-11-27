@@ -28,14 +28,13 @@ public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Spawning")
-	TSubclassOf<AEnemyCharacter> EnemyClass;
-
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Spawning")
 	UBoxComponent* SpawnVolume;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Spawning")
 	class AWaveManager* WaveManager;
+
+	void SpawnSpecificEnemy(TSubclassOf<AEnemyCharacter> InEnemyClass);
 
 	void SpawnWave(int32 TotalEnemies);
 };

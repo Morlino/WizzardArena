@@ -116,10 +116,6 @@ void AWizzardCharacter::RototatePlayerToCursor()
 		FRotator LookRot = UKismetMathLibrary::FindLookAtRotation(GetActorLocation(), Hit.Location);
 
 		FRotator NewRotation(GetActorRotation().Pitch, LookRot.Yaw, GetActorRotation().Roll);
-		UE_LOG(LogTemp, Warning, TEXT("NewRotation = Pitch: %f  Yaw: %f  Roll: %f"),
-			NewRotation.Pitch,
-			NewRotation.Yaw,
-			NewRotation.Roll);
 		SetActorRotation(NewRotation);
 	}
 }

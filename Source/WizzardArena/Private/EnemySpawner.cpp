@@ -18,35 +18,6 @@ AEnemySpawner::AEnemySpawner()
 	SpawnVolume->SetBoxExtent(FVector(200.f, 200.f, 100.f));
 }
 
-void AEnemySpawner::SpawnEnemyInVolume()
-{
-	if (!SpawnVolume || !EnemyClass) return;
-	
-	FVector Origin = SpawnVolume->GetComponentLocation();
-	FVector Extent = SpawnVolume->GetScaledBoxExtent();
-
-	FVector RandomLocation = UKismetMathLibrary::RandomPointInBoundingBox(Origin, Extent);
-	FRotator RandomRotation = FRotator::ZeroRotator;
-
-	FActorSpawnParameters SpawnParams;
-	SpawnParams.Owner = this;
-
-	AEnemyCharacter* NewEnemy = GetWorld()->SpawnActor<AEnemyCharacter>(EnemyClass, RandomLocation, RandomRotation, SpawnParams);
-
-	if (NewEnemy && WaveManager)
-	{
-		UE_LOG(LogTemp, Warning, TEXT("Enemy BOUND!"));
-
-		// Bind to wave manager
-		NewEnemy->OnDeath.AddDynamic(WaveManager, &AWaveManager::OnEnemyKilled);
-	}
-	else
-	{
-		UE_LOG(LogTemp, Warning, TEXT("Fild to Bind!"));
-
-	}
-}
-
 // Called when the game starts or when spawned
 void AEnemySpawner::BeginPlay()
 {
@@ -60,10 +31,21 @@ void AEnemySpawner::Tick(float DeltaTime)
 
 }
 
-void AEnemySpawner::SpawnWave(int32 TotalEnemies)
+void AEnemySpawner::SpawnSpecificEnemy(TSubclassOf<AEnemyCharacter> InEnemyClass)
 {
-	for (int32 i = 0; i < TotalEnemies; i++)
-	{
-		SpawnEnemyInVolume();
-	}
+	if (!SpawnVolume || !InEnemyClass) return;
+    
+	const FVector Origin = SpawnVolume->GetComponentLocation();
+	const FVector Extent = SpawnVolume->GetScaledBoxExtent();
+
+	FVector SpawnLocation = UKismetMathLibrary::RandomPointInBoundingBox(Origin, Extent);
+
+	AEnemyCharacter* Enemy = GetWorld()->SpawnActor<AEnemyCharacter>(
+		InEnemyClass, 
+		SpawnLocation,
+		FRotator::ZeroRotator
+	);
+
+	if (Enemy && WaveManager)
+		Enemy->OnDeath.AddDynamic(WaveManager, &AWaveManager::OnEnemyKilled);
 }

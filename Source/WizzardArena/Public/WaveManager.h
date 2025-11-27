@@ -7,6 +7,27 @@
 #include "EnemySpawner.h"
 #include "WaveManager.generated.h"
 
+USTRUCT(BlueprintType)
+struct FEnemySpawnInfo
+{
+	GENERATED_BODY()
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	TSubclassOf<AEnemyCharacter> EnemyClass;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	int32 Count = 1;
+};
+
+USTRUCT(BlueprintType)
+struct FWaveDefinition
+{
+	GENERATED_BODY()
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	TArray<FEnemySpawnInfo> Enemies;
+};
+
 UCLASS()
 class WIZZARDARENA_API AWaveManager : public AActor
 {
@@ -34,11 +55,11 @@ public:
 	UPROPERTY(EditAnywhere)
 	TArray<AEnemySpawner*> Spawners;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	TArray<FWaveDefinition> Waves;
+
 	UPROPERTY(BlueprintReadOnly)
 	int32 CurrentWave = 0;
-
-	UPROPERTY(EditAnywhere)
-	TArray<int32> EnemiesPerWave;
 
 	UPROPERTY(EditAnywhere)
 	int32 BossWave = 10;
