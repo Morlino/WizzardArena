@@ -31,6 +31,8 @@ private:
 
 	bool bCanProjectileAttack = true;
 
+	float LastDamageTime = 0.f;
+
 public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "HealthWidget")
 	class UWidgetComponent* HealthWidgetComponent;
@@ -61,17 +63,19 @@ public:
 	float ProjectileCooldown = 2.0f;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Combat")
-	float ProjectileDamage = 10.0f;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Combat")
 	float ProjectileSpeed = 1000.0f;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Combat")
 	float ProjectilePushStrength = 500.f;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Combat")
+	float ProjectileRadius = 1.0f;
+
 	// FUNCTIONS
 	// Core
 	void BeginPlay();
+	void OnOverlapWithPawn(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp,
+	                       int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
 
 	UFUNCTION()
 	void UpdateHealthWidget(float NewHealth, float NewMaxHealth);

@@ -46,6 +46,8 @@ AWizzardCharacter::AWizzardCharacter()
 	DashCollisionSphere->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 	DashCollisionSphere->SetCollisionResponseToAllChannels(ECR_Overlap);
 	DashCollisionSphere->OnComponentBeginOverlap.AddDynamic(this, &AWizzardCharacter::OnDashOverlap);
+
+	CurrentHealth = MaxHealth;
 }
 
 // Called when the game starts or when spawned

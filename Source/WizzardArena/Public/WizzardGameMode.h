@@ -24,6 +24,9 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Audio")
 	USoundBase* VictoryMusic;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Audio")
+	USoundBase* LevelMusic;
+
 	UFUNCTION()
 	void HandleWinCondition();
 };

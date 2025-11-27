@@ -8,9 +8,6 @@ ABaseCharacter::ABaseCharacter()
 {
  	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
-
-	// Stats
-	CurrentHealth = MaxHealth;
 }
 
 // Called when the game starts or when spawned
@@ -18,6 +15,8 @@ void ABaseCharacter::BeginPlay()
 {
 	Super::BeginPlay();
 
+	// Stats
+	CurrentHealth = MaxHealth;
 }
 
 // Called every frame
@@ -50,6 +49,8 @@ float ABaseCharacter::TakeDamage(float DamageAmount, const FDamageEvent& DamageE
 	UE_LOG(LogTemp, Log, TEXT("Take Damage %f"), DamageAmount);
 	float ActualDamage = FMath::Clamp(DamageAmount, 0.f, MaxHealth);
 	CurrentHealth -= ActualDamage;
+
+	PlayAnimMontage(GetHitMontage);
 
 	// Broadcast an event so anyone listening (HUD, effects, etc.) can respond
 	OnHealthChanged.Broadcast(CurrentHealth, MaxHealth);

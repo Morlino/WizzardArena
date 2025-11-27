@@ -24,6 +24,11 @@ void AWizzardGameMode::BeginPlay()
 	{
 		WaveMgr->OnAllWavesCompleted.AddDynamic(this, &AWizzardGameMode::HandleWinCondition);
 	}
+
+	if (LevelMusic)
+	{
+		UGameplayStatics::PlaySound2D(this, LevelMusic);
+	}
 }
 
 void AWizzardGameMode::HandleWinCondition()

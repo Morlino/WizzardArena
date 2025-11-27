@@ -124,3 +124,17 @@ void AWizzardProjectile::SetProjectileOwner(AActor* InOwner)
 	ProjectileOwner = InOwner;
 }
 
+void AWizzardProjectile::SetProjectileRadius(float InRadius)
+{
+	// Scale mesh and VFX uniformly
+	if (ProjectileMesh)
+	{
+		ProjectileMesh->SetWorldScale3D(FVector(InRadius));
+	}
+
+	if (ProjectileVFX)
+	{
+		ProjectileVFX->SetWorldScale3D(FVector(InRadius));
+	}
+}
+

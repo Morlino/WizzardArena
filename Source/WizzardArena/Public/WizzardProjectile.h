@@ -53,6 +53,6 @@ public:
 	void SetPushStrength(float InPushStrength);
 	void SetProjectileSpeed(float InProjectileSpeed);
 	void SetProjectileOwner(AActor* InOwner);
-
+	void SetProjectileRadius(float InRadius);
 	void ApplyPushBack(AActor* OtherActor, UPrimitiveComponent* OtherComp);
 };

@@ -235,6 +235,7 @@ void AEnemyCharacter::ShootProjectiles()
 			EnemyProjectile->SetProjectileSpeed(ProjectileSpeed);
 			EnemyProjectile->SetPushStrength(PushStrength);
 			EnemyProjectile->SetProjectileOwner(this);
+			EnemyProjectile->SetProjectileRadius(ProjectileRadius);
 		}
 	}
 }
