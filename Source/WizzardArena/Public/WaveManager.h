@@ -7,6 +7,8 @@
 #include "EnemySpawner.h"
 #include "WaveManager.generated.h"
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnAllWavesCompleted);
+
 USTRUCT(BlueprintType)
 struct FEnemySpawnInfo
 {
@@ -51,6 +53,9 @@ protected:
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
+
+	UPROPERTY(BlueprintAssignable)
+	FOnAllWavesCompleted OnAllWavesCompleted;
 
 	UPROPERTY(EditAnywhere)
 	TArray<AEnemySpawner*> Spawners;

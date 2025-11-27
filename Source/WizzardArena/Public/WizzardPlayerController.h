@@ -28,4 +28,7 @@ public:
 	
 	UPROPERTY()
 	class UWizzardHUD* WizzardHUD;
+
+	UFUNCTION(BlueprintCallable)
+	void ClientShowWinScreen();
 };

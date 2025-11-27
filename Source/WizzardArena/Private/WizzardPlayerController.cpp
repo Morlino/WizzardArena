@@ -32,3 +32,14 @@ void AWizzardPlayerController::BeginPlay()
 		}
 	}
 }
+
+void AWizzardPlayerController::ClientShowWinScreen()
+{
+	// if (WinWidgetClass)
+	// {
+	// 	UUserWidget* W = CreateWidget(this, WinWidgetClass);
+	// 	W->AddToViewport();
+	// }
+	//
+	// SetPause(true);
+}

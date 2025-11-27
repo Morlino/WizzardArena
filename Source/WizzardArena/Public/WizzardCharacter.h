@@ -55,7 +55,6 @@ protected:
 	void Move(const FInputActionValue& Value);
 	void UpdateCursorWorldLocation();
 
-	void RotateToCursor();
 	void RototatePlayerToCursor();
 
 	// Called to bind functionality to input
@@ -114,6 +113,8 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Abilities")
 	class UAnimMontage* DashAnimation;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Condition")
+	bool HasWon = false;
 
 	// FUNCTIONS
 	// Utility
@@ -149,4 +150,7 @@ public:
 
 	UFUNCTION()
 	void HandleDash(float DeltaTime);
+
+	UFUNCTION()
+	void HandleWin();
 };

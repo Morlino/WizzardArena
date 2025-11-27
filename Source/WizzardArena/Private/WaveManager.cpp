@@ -51,13 +51,23 @@ void AWaveManager::OnEnemyKilled(ABaseCharacter* DeadEnemy)
 	if (EnemiesRemaining <= 0)
 	{
 		UE_LOG(LogTemp, Error, TEXT("START NEXT"));
-		GetWorldTimerManager().SetTimer(
-			WaveTimerHandle,
-			this,
-			&AWaveManager::StartNextWave,
-			TimeBetweenWaves,
-			false
-		);
+
+		// If this was the final wave → trigger victory instantly
+		if (CurrentWave >= Waves.Num())
+		{
+			OnAllWavesCompleted.Broadcast();
+		}
+		else
+		{
+			// Otherwise wait normally
+			GetWorldTimerManager().SetTimer(
+				WaveTimerHandle,
+				this,
+				&AWaveManager::StartNextWave,
+				TimeBetweenWaves,
+				false
+			);
+		}
 	}
 }
 
@@ -80,16 +90,12 @@ void AWaveManager::StartNextWave()
 {
 	CurrentWave++;
 
-	bool bIsBossWave = (CurrentWave == BossWave);
+	if (CurrentWave > Waves.Num())
+	{
+		OnAllWavesCompleted.Broadcast();
+		return;
+	}
 
-	if (bIsBossWave)
-	{
-		EnemiesRemaining = 1;
-		// TODO: SpawnBoss();
-	}
-	else
-	{
-		SpawnWaveEnemies();
-	}
+	SpawnWaveEnemies();
 }
 

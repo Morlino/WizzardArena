@@ -19,4 +19,11 @@ public:
 
 protected:
 	virtual void BeginPlay() override;
+
+public:
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Audio")
+	USoundBase* VictoryMusic;
+
+	UFUNCTION()
+	void HandleWinCondition();
 };

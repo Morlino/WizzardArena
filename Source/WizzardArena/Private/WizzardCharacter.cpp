@@ -10,6 +10,7 @@
 #include "WizzardPlayerController.h"
 #include "WizzardProjectile.h"
 #include "Components/SphereComponent.h"
+#include "GameFramework/CharacterMovementComponent.h"
 #include "Kismet/GameplayStatics.h"
 #include "Kismet/KismetMathLibrary.h"
 
@@ -124,6 +125,9 @@ void AWizzardCharacter::RototatePlayerToCursor()
 void AWizzardCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
+
+	if (HasWon)
+		return;
 
 	// Cooldowns decrement
 	FireCurrentCooldown -= DeltaTime;
@@ -307,6 +311,16 @@ void AWizzardCharacter::HandleDash(float DeltaTime)
 		bIsDashing = false;
 		DashCollisionSphere->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 	}
+}
+
+void AWizzardCharacter::HandleWin()
+{
+	GetCharacterMovement()->DisableMovement();
+	HasWon = true;
+
+	// Rotate character down
+	FRotator WinRotation = FRotator(0, 180, 0);
+	SetActorRotation(WinRotation);
 }
 
 // Called to bind functionality to input
