@@ -49,6 +49,9 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Combat")
 	float AttackCooldown = 1.0f;
 
+	UPROPERTY(BlueprintReadWrite)
+	class AWaveManager* WaveManager;
+
 	// Projectile
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Combat")
 	TSubclassOf<AActor> ProjectileClass;

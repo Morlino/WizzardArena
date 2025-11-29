@@ -3,6 +3,8 @@
 
 #include "EnemyCharacter.h"
 #include "EnemyAIController.h"
+#include "EngineUtils.h"
+#include "WaveManager.h"
 #include "WizzardHealthWidget.h"
 #include "WizzardProjectile.h"
 #include "Kismet/GameplayStatics.h"
@@ -26,7 +28,6 @@ AEnemyCharacter::AEnemyCharacter()
 
 	HealthWidgetComponent->SetRelativeLocation(FVector(0.f, 0.f, 120.f));
 	HealthWidgetComponent->SetDrawSize(FVector2D(150.f, 20.f));
-
 }
 
 void AEnemyCharacter::CollectSetSpawnPoints()
@@ -60,6 +61,20 @@ void AEnemyCharacter::BeginPlay()
 	OnHealthChanged.AddDynamic(this, &AEnemyCharacter::UpdateHealthWidget);
 
 	CollectSetSpawnPoints();
+
+	if (!WaveManager)
+	{
+		for (TActorIterator<AWaveManager> It(GetWorld()); It; ++It)
+		{
+			WaveManager = *It;
+			break;
+		}
+	}
+
+	if (WaveManager)
+	{
+		WaveManager->RegisterEnemy(this);
+	}
 }
 
 void AEnemyCharacter::UpdateHealthWidget(float NewHealth, float NewMaxHealth)

@@ -3,6 +3,8 @@
 
 #include "WaveManager.h"
 
+#include "WaveWidget.h"
+
 // Sets default values
 AWaveManager::AWaveManager()
 {
@@ -45,21 +47,37 @@ void AWaveManager::SpawnWaveEnemies()
 
 void AWaveManager::OnEnemyKilled(ABaseCharacter* DeadEnemy)
 {
-	EnemiesRemaining--;
-	UE_LOG(LogTemp, Error, TEXT("Enemy DIED"));
+	// Cast to AEnemyCharacter so it matches ActiveEnemies array type
+	AEnemyCharacter* EnemyChar = Cast<AEnemyCharacter>(DeadEnemy);
+	if (EnemyChar)
+	{
+		ActiveEnemies.Remove(EnemyChar);
+	}
 
+	// Update remaining enemies count
+	EnemiesRemaining = ActiveEnemies.Num();
+
+	UE_LOG(LogTemp, Warning, TEXT("Enemy DIED, %d remaining"), EnemiesRemaining);
+
+	// Update widget
+	if (WaveWidget)
+	{
+		WaveWidget->SetEnemiesRemaining(EnemiesRemaining);
+	}
+
+	// Check if wave is complete
 	if (EnemiesRemaining <= 0)
 	{
-		UE_LOG(LogTemp, Error, TEXT("START NEXT"));
+		UE_LOG(LogTemp, Warning, TEXT("START NEXT WAVE"));
 
-		// If this was the final wave → trigger victory instantly
+		// If this was the final wave → trigger victory
 		if (CurrentWave >= Waves.Num())
 		{
 			OnAllWavesCompleted.Broadcast();
 		}
 		else
 		{
-			// Otherwise wait normally
+			// Otherwise wait normally before starting next wave
 			GetWorldTimerManager().SetTimer(
 				WaveTimerHandle,
 				this,
@@ -71,12 +89,28 @@ void AWaveManager::OnEnemyKilled(ABaseCharacter* DeadEnemy)
 	}
 }
 
+void AWaveManager::RegisterEnemy(AEnemyCharacter* Enemy)
+{
+	if (!Enemy) return;
+	ActiveEnemies.Add(Enemy);
+
+	// Subscribe to death
+	Enemy->OnDeath.AddDynamic(this, &AWaveManager::OnEnemyKilled);
+    
+	EnemiesRemaining = ActiveEnemies.Num();
+
+	// Update widget
+	if (WaveWidget)
+	{
+		WaveWidget->SetEnemiesRemaining(EnemiesRemaining);
+	}
+}
+
 // Called when the game starts or when spawned
 void AWaveManager::BeginPlay()
 {
 	Super::BeginPlay();
 
-	StartNextWave();
 }
 
 // Called every frame
@@ -94,6 +128,18 @@ void AWaveManager::StartNextWave()
 	{
 		OnAllWavesCompleted.Broadcast();
 		return;
+	}
+
+	// Update widget for new wave
+	if (WaveWidget)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Wave %d"), CurrentWave);
+		WaveWidget->SetWave(CurrentWave);
+		WaveWidget->SetEnemiesRemaining(EnemiesRemaining);
+	}
+	else
+	{
+		UE_LOG(LogTemp, Warning, TEXT("WE ARE FUCKED"));
 	}
 
 	SpawnWaveEnemies();

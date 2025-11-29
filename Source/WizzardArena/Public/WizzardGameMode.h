@@ -27,6 +27,12 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Audio")
 	USoundBase* LevelMusic;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = UI)
+	class UWaveWidget* WaveHUDInstance;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = UI)
+	TSubclassOf<class UWaveWidget> WaveWidgetClass;
+
 	UFUNCTION()
 	void HandleWinCondition();
 };

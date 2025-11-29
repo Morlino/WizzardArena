@@ -69,9 +69,18 @@ public:
 	UPROPERTY(EditAnywhere)
 	float TimeBetweenWaves = 5.0f;
 
+	UPROPERTY()
+	TArray<AEnemyCharacter*> ActiveEnemies;
+
+	UPROPERTY()
+	class UWaveWidget* WaveWidget;
+
 	UFUNCTION()
 	void StartNextWave();
 
 	UFUNCTION()
 	void OnEnemyKilled(ABaseCharacter* DeadEnemy);
+
+	UFUNCTION()
+	void RegisterEnemy(AEnemyCharacter* Enemy);
 };
