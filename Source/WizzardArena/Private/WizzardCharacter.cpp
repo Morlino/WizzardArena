@@ -47,6 +47,12 @@ AWizzardCharacter::AWizzardCharacter()
 	DashCollisionSphere->SetCollisionResponseToAllChannels(ECR_Overlap);
 	DashCollisionSphere->OnComponentBeginOverlap.AddDynamic(this, &AWizzardCharacter::OnDashOverlap);
 
+	// Barrier
+	ShieldMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("ShieldMesh"));
+	ShieldMesh->SetupAttachment(GetRootComponent());
+	ShieldMesh->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	ShieldMesh->SetVisibility(false);
+
 	CurrentHealth = MaxHealth;
 }
 
@@ -352,6 +358,23 @@ void AWizzardCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCo
 	}
 }
 
+void AWizzardCharacter::ActivateShield(int32 Hits = 1)
+{
+	bHasShield = true;
+	ShieldHitsRemaining = Hits;
+
+	ShieldMesh->SetVisibility(true);
+}
+
+void AWizzardCharacter::BreakShield()
+{
+	bHasShield = false;
+	ShieldHitsRemaining = 0;
+
+	UGameplayStatics::PlaySound2D(this, BreakShieldSound);
+	ShieldMesh->SetVisibility(false);
+}
+
 void AWizzardCharacter::OnDashOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
 	UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
@@ -360,4 +383,22 @@ void AWizzardCharacter::OnDashOverlap(UPrimitiveComponent* OverlappedComponent, 
 	UE_LOG(LogTemp, Log, TEXT("Dash Overlap"));
 
 	UGameplayStatics::ApplyDamage(OtherActor, DashDamage, GetController(), this, nullptr);
+}
+
+float AWizzardCharacter::TakeDamage(float DamageAmount, const FDamageEvent& DamageEvent, AController* EventInstigator,
+	AActor* DamageCauser)
+{
+	if (bHasShield)
+	{
+		ShieldHitsRemaining--;
+
+		if (ShieldHitsRemaining <= 0)
+		{
+			BreakShield();
+		}
+
+		return 0.0f;
+	}
+
+	return Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
 }

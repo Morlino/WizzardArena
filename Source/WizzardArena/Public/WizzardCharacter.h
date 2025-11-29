@@ -62,6 +62,8 @@ protected:
 
 	void OnDashOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
 
+	virtual float TakeDamage(float DamageAmount, const FDamageEvent& DamageEvent, AController* EventInstigator, AActor* DamageCauser) override;
+
 public:
 	// PROPERTIES
 	// Camera Components
@@ -116,6 +118,19 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Condition")
 	bool HasWon = false;
 
+	// Barrier
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Powerups")
+	UStaticMeshComponent* ShieldMesh;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Audio")
+	USoundBase* BreakShieldSound;
+
+	UPROPERTY(BlueprintReadWrite, Category="Powerups")
+	bool bHasShield = false;
+	
+	UPROPERTY(BlueprintReadWrite, Category="Powerups")
+	int32 ShieldHitsRemaining = 0;
+
 	// FUNCTIONS
 	// Utility
 	virtual void Tick(float DeltaTime) override;
@@ -156,4 +171,9 @@ public:
 
 	UFUNCTION()
 	void HandleWin();
+
+	// Powerups
+	void ActivateShield(int32 Hits);
+
+	void BreakShield();
 };
