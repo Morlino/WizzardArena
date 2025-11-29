@@ -78,6 +78,24 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Drops")
 	float DropChance = 0.2f;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Death")
+	bool bSpawnsSmallerOnDeath = false;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Death", meta=(EditCondition="bSpawnsSmallerOnDeath"))
+	int32 NumberOfSplits = 3;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Death", meta=(EditCondition="bSpawnsSmallerOnDeath"))
+	float SplitScaleFactor = 0.5f;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Death", meta=(EditCondition="bSpawnsSmallerOnDeath"))
+	float SpawnRadius = 100.f;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Death", meta=(EditCondition="bSpawnsSmallerOnDeath"))
+	int32 MaxSplitLevel = 1;
+
+	UPROPERTY()
+	int32 SplitLevel = 0;
+
 	// FUNCTIONS
 	// Core
 	void BeginPlay();
@@ -89,8 +107,10 @@ public:
 	void UpdateHealthWidget(float NewHealth, float NewMaxHealth);
 
 	void SpawnRandomPickup();
+	void SpawnSplitters();
 
-	void Die() override;
+	UFUNCTION(BlueprintCallable, Category="Character|Death")
+	void Die_Implementation() override;
 
 	// Movement
 	UFUNCTION(BlueprintCallable, Category="Combat")

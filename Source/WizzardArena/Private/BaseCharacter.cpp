@@ -26,7 +26,7 @@ void ABaseCharacter::Tick(float DeltaTime)
 
 }
 
-void ABaseCharacter::Die()
+void ABaseCharacter::Die_Implementation()
 {
 	UE_LOG(LogTemp, Log, TEXT("%s Died"), *GetName());
     

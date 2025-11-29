@@ -95,11 +95,65 @@ void AEnemyCharacter::SpawnRandomPickup()
 	GetWorld()->SpawnActor<AActor>(PickupToSpawn, SpawnLocation, SpawnRotation, SpawnParams);
 }
 
-void AEnemyCharacter::Die()
+void AEnemyCharacter::SpawnSplitters()
+{
+	for (int32 i = 0; i < NumberOfSplits; ++i)
+	{
+		FVector Offset = FVector(
+			FMath::FRandRange(-50.f, 50.f),
+			FMath::FRandRange(-50.f, 50.f),
+			0.f
+		);
+
+		FVector SpawnLocation = GetActorLocation() + Offset;
+		FRotator SpawnRotation = GetActorRotation();
+
+		FActorSpawnParameters SpawnParams;
+		SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButAlwaysSpawn;
+
+		// Spawn a copy of this actor
+		AEnemyCharacter* SmallEnemy = GetWorld()->SpawnActor<AEnemyCharacter>(
+			GetClass(), // spawn the same class
+			SpawnLocation,
+			SpawnRotation,
+			SpawnParams
+		);
+
+		if (SmallEnemy)
+		{
+			SmallEnemy->SplitLevel = this->SplitLevel + 1;
+			SmallEnemy->bSpawnsSmallerOnDeath = bSpawnsSmallerOnDeath;
+
+			// Check if it should spawn at all
+			if (SmallEnemy->SplitLevel >= MaxSplitLevel)
+			{
+				SmallEnemy->bSpawnsSmallerOnDeath = false;
+			}
+
+			// scale down
+			SmallEnemy->SetActorScale3D(GetActorScale3D() * SplitScaleFactor);
+
+			// Scale stats
+			SmallEnemy->ProjectileRadius *= SplitScaleFactor;
+			SmallEnemy->Damage *= SplitScaleFactor;
+
+			SmallEnemy->MaxHealth *= SplitScaleFactor;
+			SmallEnemy->CurrentHealth = SmallEnemy->MaxHealth;
+			SmallEnemy->OnHealthChanged.Broadcast(SmallEnemy->CurrentHealth, SmallEnemy->MaxHealth);
+		}
+	}
+}
+
+void AEnemyCharacter::Die_Implementation()
 {
 	SpawnRandomPickup();
 
-	Super::Die();
+	if (bSpawnsSmallerOnDeath && NumberOfSplits > 0)
+	{
+		SpawnSplitters();
+	}
+
+	Super::Die_Implementation();
 }
 
 void AEnemyCharacter::Attack(AActor* TargetActor)

@@ -67,9 +67,6 @@ public:
 	int32 CurrentWave = 0;
 
 	UPROPERTY(EditAnywhere)
-	int32 BossWave = 10;
-
-	UPROPERTY(EditAnywhere)
 	float TimeBetweenWaves = 5.0f;
 
 	UFUNCTION()

@@ -24,8 +24,6 @@ protected:
 	
 	virtual float TakeDamage(float DamageAmount, const FDamageEvent& DamageEvent, AController* EventInstigator, AActor* DamageCauser) override;
 
-	virtual void Die();
-
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
@@ -63,4 +61,9 @@ public:
 
 	UFUNCTION()
 	void SetMaxHealth(float inMaxHealth);
+
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category="Character|Death")
+	void Die();
+
+	virtual void Die_Implementation();
 };
