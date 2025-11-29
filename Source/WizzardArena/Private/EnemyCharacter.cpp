@@ -7,7 +7,9 @@
 #include "WizzardProjectile.h"
 #include "Kismet/GameplayStatics.h"
 #include "Animation/AnimMontage.h"
+#include "Components/CapsuleComponent.h"
 #include "Components/WidgetComponent.h"
+#include "Windows/WindowsApplication.h"
 
 AEnemyCharacter::AEnemyCharacter()
 {
@@ -70,6 +72,34 @@ void AEnemyCharacter::UpdateHealthWidget(float NewHealth, float NewMaxHealth)
     {
         HealthWidget->SetHealth(NewHealth, NewMaxHealth);
     }
+}
+
+void AEnemyCharacter::SpawnRandomPickup()
+{
+	if (PossibleDrops.Num() == 0) return;
+
+	if (FMath::FRand() > DropChance) return;
+
+	int32 RandomIndex = FMath::RandRange(0, PossibleDrops.Num() - 1);
+	TSubclassOf<AActor> PickupToSpawn = PossibleDrops[RandomIndex];
+
+	if (!PickupToSpawn) return;
+
+	UCapsuleComponent* Capsule = GetCapsuleComponent();
+	FVector SpawnLocation = GetActorLocation() - FVector(0.f, 0.f, Capsule->GetScaledCapsuleHalfHeight()) + FVector(0.f, 0.f, 20.f);
+	FRotator SpawnRotation = FRotator::ZeroRotator;
+
+	FActorSpawnParameters SpawnParams;
+	SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButAlwaysSpawn;
+
+	GetWorld()->SpawnActor<AActor>(PickupToSpawn, SpawnLocation, SpawnRotation, SpawnParams);
+}
+
+void AEnemyCharacter::Die()
+{
+	SpawnRandomPickup();
+
+	Super::Die();
 }
 
 void AEnemyCharacter::Attack(AActor* TargetActor)

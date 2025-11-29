@@ -71,14 +71,26 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Combat")
 	float ProjectileRadius = 1.0f;
 
+	// Death Drops
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Drops")
+	TArray<TSubclassOf<AActor>> PossibleDrops;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Drops")
+	float DropChance = 0.2f;
+
 	// FUNCTIONS
 	// Core
 	void BeginPlay();
+
 	void OnOverlapWithPawn(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp,
 	                       int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
 
 	UFUNCTION()
 	void UpdateHealthWidget(float NewHealth, float NewMaxHealth);
+
+	void SpawnRandomPickup();
+
+	void Die() override;
 
 	// Movement
 	UFUNCTION(BlueprintCallable, Category="Combat")
