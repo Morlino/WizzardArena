@@ -56,4 +56,11 @@ public:
 
 	UFUNCTION()
 	float GetMaxHealth();
+
+	// Setters
+	UFUNCTION()
+	void SetCurrentHealth(float inCurrentHealth);
+
+	UFUNCTION()
+	void SetMaxHealth(float inMaxHealth);
 };

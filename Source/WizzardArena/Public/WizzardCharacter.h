@@ -120,6 +120,8 @@ public:
 	// Utility
 	virtual void Tick(float DeltaTime) override;
 
+	void Heal(float HealingAmount);
+
 	// Setters
 	UFUNCTION()
 	void SetHUDReference(UWizzardHUD* HUD);
@@ -127,6 +129,7 @@ public:
 	// Projectile
 	UFUNCTION()
 	void ShootProjectile();
+
 	void PlayCastMontageIfPossible();
 
 	UFUNCTION()

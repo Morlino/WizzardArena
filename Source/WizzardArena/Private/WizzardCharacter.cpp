@@ -144,6 +144,13 @@ void AWizzardCharacter::Tick(float DeltaTime)
 	RototatePlayerToCursor();
 }
 
+void AWizzardCharacter::Heal(float HealingAmount)
+{
+	CurrentHealth = FMath::Clamp(CurrentHealth + HealingAmount, 0.f, MaxHealth);
+	OnHealthChanged.Broadcast(CurrentHealth, MaxHealth);
+	UE_LOG(LogTemp, Log, TEXT("%s healed to %f"), *GetName(), CurrentHealth);
+}
+
 void AWizzardCharacter::SetHUDReference(UWizzardHUD* HUD)
 {
 	WizzardHUD = HUD;

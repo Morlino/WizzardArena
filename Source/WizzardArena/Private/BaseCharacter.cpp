@@ -72,3 +72,13 @@ float ABaseCharacter::GetMaxHealth()
 {
 	return MaxHealth;
 }
+
+void ABaseCharacter::SetCurrentHealth(float inCurrentHealth)
+{
+	CurrentHealth = inCurrentHealth;
+}
+
+void ABaseCharacter::SetMaxHealth(float inMaxHealth)
+{
+	MaxHealth = inMaxHealth;
+}
