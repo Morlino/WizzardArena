@@ -6,6 +6,8 @@
 #include "GameFramework/GameModeBase.h"
 #include "WizzardGameMode.generated.h"
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnGameEnd);
+
 /**
  * 
  */
@@ -21,6 +23,9 @@ protected:
 	virtual void BeginPlay() override;
 
 public:
+	UPROPERTY()
+	UAudioComponent* LevelMusicComponent;
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Audio")
 	USoundBase* VictoryMusic;
 
@@ -28,11 +33,19 @@ public:
 	USoundBase* LevelMusic;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = UI)
-	class UWaveWidget* WaveHUDInstance;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = UI)
 	TSubclassOf<class UWaveWidget> WaveWidgetClass;
 
+	UPROPERTY(BlueprintAssignable, Category="Game")
+	FOnGameEnd OnGameWon;
+
+	UPROPERTY(BlueprintAssignable, Category="Game")
+	FOnGameEnd OnGameLost;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Cutscene")
+	class ULevelSequence* WinSequence;
+
 	UFUNCTION()
-	void HandleWinCondition();
+	void HandleLastDefaultWave();
+	void PlayWinSequence();
+	void HandleBossDefeated();
 };

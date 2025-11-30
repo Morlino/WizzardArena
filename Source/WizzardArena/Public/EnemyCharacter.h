@@ -110,6 +110,7 @@ public:
 	void UpdateHealthWidget(float NewHealth, float NewMaxHealth);
 
 	void SpawnRandomPickup();
+
 	void SpawnSplitters();
 
 	UFUNCTION(BlueprintCallable, Category="Character|Death")

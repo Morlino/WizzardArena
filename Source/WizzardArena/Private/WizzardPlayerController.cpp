@@ -5,6 +5,7 @@
 #include "EnhancedInputSubsystems.h"
 #include "WaveManager.h"
 #include "WizzardCharacter.h"
+#include "WizzardGameMode.h"
 #include "WizzardHUD.h"
 #include "Kismet/GameplayStatics.h"
 
@@ -32,18 +33,26 @@ void AWizzardPlayerController::BeginPlay()
 				MyChar->SetHUDReference(WizzardHUD);
 			}
 
+			if (AWaveManager* WM = Cast<AWaveManager>(UGameplayStatics::GetActorOfClass(this, AWaveManager::StaticClass())))
+			{
+				WM->SetHUDReference(WizzardHUD);
+			}
+
 			WizzardHUD->InitializeWidgets();
+		}
+	}
+
+	if (AWizzardGameMode* GM = Cast<AWizzardGameMode>(GetWorld()->GetAuthGameMode()))
+	{
+		if (WizzardHUD) // the instance you created above
+		{
+			GM->OnGameWon.AddDynamic(WizzardHUD, &UWizzardHUD::ShowWin);
+			GM->OnGameLost.AddDynamic(WizzardHUD, &UWizzardHUD::ShowLose);
 		}
 	}
 }
 
 void AWizzardPlayerController::ClientShowWinScreen()
 {
-	// if (WinWidgetClass)
-	// {
-	// 	UUserWidget* W = CreateWidget(this, WinWidgetClass);
-	// 	W->AddToViewport();
-	// }
-	//
-	// SetPause(true);
+
 }

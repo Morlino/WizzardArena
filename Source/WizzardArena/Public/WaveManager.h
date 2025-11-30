@@ -5,9 +5,12 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
 #include "EnemySpawner.h"
+#include "WizzardHUD.h"
 #include "WaveManager.generated.h"
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnAllWavesCompleted);
+
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnBossWavesCompleted);
 
 USTRUCT(BlueprintType)
 struct FEnemySpawnInfo
@@ -35,9 +38,10 @@ class WIZZARDARENA_API AWaveManager : public AActor
 {
 	GENERATED_BODY()
 	
-public:	
+public:
 	// Sets default values for this actor's properties
 	AWaveManager();
+	void SetHUDReference(UWizzardHUD* InHUD);
 
 private:
 	FTimerHandle WaveTimerHandle;
@@ -57,6 +61,9 @@ public:
 	UPROPERTY(BlueprintAssignable)
 	FOnAllWavesCompleted OnAllWavesCompleted;
 
+	UPROPERTY(BlueprintAssignable)
+	FOnBossWavesCompleted OnBossWavesCompleted;
+
 	UPROPERTY(EditAnywhere)
 	TArray<AEnemySpawner*> Spawners;
 
@@ -72,8 +79,8 @@ public:
 	UPROPERTY()
 	TArray<AEnemyCharacter*> ActiveEnemies;
 
-	UPROPERTY()
-	class UWaveWidget* WaveWidget;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	class UWizzardHUD* HUD;
 
 	UFUNCTION()
 	void StartNextWave();

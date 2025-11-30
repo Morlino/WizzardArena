@@ -53,6 +53,7 @@ protected:
 	void UpdateHealthHUD(float NewHealth, float NewMaxHealth);
 
 	void Move(const FInputActionValue& Value);
+
 	void UpdateCursorWorldLocation();
 
 	void RototatePlayerToCursor();
@@ -118,6 +119,12 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Condition")
 	bool HasWon = false;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Condition")
+	bool HasLost = false;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Audio")
+	USoundBase* DeathSound;
+
 	// Barrier
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Powerups")
 	UStaticMeshComponent* ShieldMesh;
@@ -142,6 +149,9 @@ public:
 	// FUNCTIONS
 	// Utility
 	virtual void Tick(float DeltaTime) override;
+
+	UFUNCTION(BlueprintCallable, Category="Character|Death")
+	void Die_Implementation() override;
 
 	void Heal(float HealingAmount);
 

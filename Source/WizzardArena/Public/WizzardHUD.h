@@ -24,6 +24,9 @@ public:
 	UPROPERTY(meta = (BindWidget))
 	class UPowerUpsWidget* PowerUpsWidget;
 
+	UPROPERTY(meta = (BindWidget))
+	class UEndGameWidget* EndGameWidget;
+
 	void InitializeWidgets();
 	
 	void SetHealth(float Current, float Max);
@@ -33,4 +36,14 @@ public:
 	void SetRapidFireBuffs(int32 Count);
 
 	void SetSpeedBuffs(int32 Count);
+
+	void SetWave(int32 WaveNumber);
+
+	void SetEnemiesRemaining(int32 EnemiesLeft);
+
+	UFUNCTION()
+	void ShowWin();
+
+	UFUNCTION()
+	void ShowLose();
 };

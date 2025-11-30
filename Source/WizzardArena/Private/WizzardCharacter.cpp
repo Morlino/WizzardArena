@@ -6,6 +6,7 @@
 #include "Camera/CameraComponent.h"
 #include "GameFramework/SpringArmComponent.h"
 #include "EnhancedInputComponent.h"
+#include "WizzardGameMode.h"
 #include "WizzardHUD.h"
 #include "WizzardPlayerController.h"
 #include "WizzardProjectile.h"
@@ -137,7 +138,7 @@ void AWizzardCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-	if (HasWon)
+	if (HasWon || HasLost)
 		return;
 
 	// Cooldowns decrement
@@ -151,6 +152,50 @@ void AWizzardCharacter::Tick(float DeltaTime)
 	// RotateToCursor();
 	UpdateCursorWorldLocation();
 	RototatePlayerToCursor();
+}
+
+void AWizzardCharacter::Die_Implementation()
+{
+	APlayerController* PC = Cast<APlayerController>(GetController());
+	if (PC)
+	{
+		DisableInput(PC);
+
+		// Start fade out
+		PC->PlayerCameraManager->StartCameraFade(
+			0.0f,     // From alpha
+			1.0f,     // To alpha
+			4.0f,    // Duration (seconds)
+			FLinearColor::Black, // Fade color
+			false,   // bShouldFadeAudio
+			true     // bHoldWhenFinished
+		);
+
+		// After fade duration, restart the level
+		FTimerHandle RestartTimerHandle;
+		GetWorldTimerManager().SetTimer(RestartTimerHandle, [this, PC]()
+		{
+			UGameplayStatics::OpenLevel(this, FName(*GetWorld()->GetName()), false);
+		}, 4.0f, false); // matches fade duration
+	}
+	GetCharacterMovement()->DisableMovement();
+
+	if (bIsFiring)
+	{
+		StopFiring();
+	}
+
+	if (AWizzardGameMode* GM = Cast<AWizzardGameMode>(GetWorld()->GetAuthGameMode()))
+	{
+		GM->OnGameLost.Broadcast();
+	}
+
+	GetMesh()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	SetActorEnableCollision(false);
+
+	UGameplayStatics::PlaySound2D(this, DeathSound);
+	
+	HasLost = true;
 }
 
 void AWizzardCharacter::Heal(float HealingAmount)

@@ -2,17 +2,20 @@
 
 
 #include "WizzardHUD.h"
+
+#include "EndGameWidget.h"
 #include "PowerUpsWidget.h"
 #include "WaveManager.h"
+#include "WaveWidget.h"
 #include "WizzardHealthWidget.h"
 #include "Kismet/GameplayStatics.h"
 
 void UWizzardHUD::InitializeWidgets()
 {
-	// Pass WaveWidget to WaveManager
-	if (AWaveManager* WaveMgr = Cast<AWaveManager>(UGameplayStatics::GetActorOfClass(GetWorld(), AWaveManager::StaticClass())))
+	if (WaveWidget)
 	{
-		WaveMgr->WaveWidget = WaveWidget;
+		WaveWidget->SetWave(0);
+		WaveWidget->SetEnemiesRemaining(0);
 	}
 
 	if (PowerUpsWidget)
@@ -20,6 +23,11 @@ void UWizzardHUD::InitializeWidgets()
 		PowerUpsWidget->UpdateShieldHits(0);
 		PowerUpsWidget->UpdateRapidFireBuffs(0);
 		PowerUpsWidget->UpdateSpeedBuffs(0);
+	}
+
+	if (EndGameWidget)
+	{
+		EndGameWidget->SetVisibility(ESlateVisibility::Hidden);	
 	}
 }
 
@@ -44,4 +52,39 @@ void UWizzardHUD::SetSpeedBuffs(int32 Count)
 {
 	if (PowerUpsWidget)
 		PowerUpsWidget->UpdateSpeedBuffs(Count);
+}
+
+void UWizzardHUD::SetWave(int32 WaveNumber)
+{
+	if (WaveWidget)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("HUD Wave %d"), WaveNumber);
+		WaveWidget->SetWave(WaveNumber);
+	}
+	else
+	{
+		UE_LOG(LogTemp, Warning, TEXT("HUD Wave NONE"));
+	}
+}
+
+void UWizzardHUD::SetEnemiesRemaining(int32 EnemiesLeft)
+{
+	if (WaveWidget)
+		WaveWidget->SetEnemiesRemaining(EnemiesLeft);
+}
+
+void UWizzardHUD::ShowWin()
+{
+	if (EndGameWidget)
+	{
+		EndGameWidget->ShowWin();
+	}
+}
+
+void UWizzardHUD::ShowLose()
+{
+	if (EndGameWidget)
+	{
+		EndGameWidget->ShowLose();
+	}
 }

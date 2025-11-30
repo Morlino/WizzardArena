@@ -4,6 +4,7 @@
 #include "WaveManager.h"
 
 #include "WaveWidget.h"
+#include "WizzardHUD.h"
 
 // Sets default values
 AWaveManager::AWaveManager()
@@ -11,6 +12,11 @@ AWaveManager::AWaveManager()
  	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 
+}
+
+void AWaveManager::SetHUDReference(UWizzardHUD* InHUD)
+{
+	HUD = InHUD;
 }
 
 void AWaveManager::SpawnWaveEnemies()
@@ -60,9 +66,9 @@ void AWaveManager::OnEnemyKilled(ABaseCharacter* DeadEnemy)
 	UE_LOG(LogTemp, Warning, TEXT("Enemy DIED, %d remaining"), EnemiesRemaining);
 
 	// Update widget
-	if (WaveWidget)
+	if (HUD)
 	{
-		WaveWidget->SetEnemiesRemaining(EnemiesRemaining);
+		HUD->SetEnemiesRemaining(EnemiesRemaining);
 	}
 
 	// Check if wave is complete
@@ -72,6 +78,10 @@ void AWaveManager::OnEnemyKilled(ABaseCharacter* DeadEnemy)
 
 		// If this was the final wave → trigger victory
 		if (CurrentWave >= Waves.Num())
+		{
+			OnBossWavesCompleted.Broadcast();
+		}
+		else if (CurrentWave + 1 <= Waves.Num())
 		{
 			OnAllWavesCompleted.Broadcast();
 		}
@@ -100,9 +110,9 @@ void AWaveManager::RegisterEnemy(AEnemyCharacter* Enemy)
 	EnemiesRemaining = ActiveEnemies.Num();
 
 	// Update widget
-	if (WaveWidget)
+	if (HUD)
 	{
-		WaveWidget->SetEnemiesRemaining(EnemiesRemaining);
+		HUD->SetEnemiesRemaining(EnemiesRemaining);
 	}
 }
 
@@ -118,13 +128,21 @@ void AWaveManager::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
+	if (HUD->WaveWidget)
+	{
+		UE_LOG(LogTemp, Error, TEXT("WaveWidget Exists"));
+	}
+	else
+	{
+		UE_LOG(LogTemp, Error, TEXT("WaveWidget Doesn't Exists"));
+	}
 }
 
 void AWaveManager::StartNextWave()
 {
-	if (!WaveWidget)
+	if (!HUD)
 	{
-		UE_LOG(LogTemp, Warning, TEXT("WaveWidget not yet assigned, delaying wave start"));
+		UE_LOG(LogTemp, Warning, TEXT("HUD not yet assigned, delaying wave start"));
 		// Try again next tick
 		GetWorldTimerManager().SetTimerForNextTick(this, &AWaveManager::StartNextWave);
 		return;
@@ -134,16 +152,16 @@ void AWaveManager::StartNextWave()
 
 	if (CurrentWave > Waves.Num())
 	{
-		OnAllWavesCompleted.Broadcast();
+		OnBossWavesCompleted.Broadcast();
 		return;
 	}
 
 	// Update widget for new wave
-	if (WaveWidget)
+	if (HUD)
 	{
 		UE_LOG(LogTemp, Warning, TEXT("Wave %d"), CurrentWave);
-		WaveWidget->SetWave(CurrentWave);
-		WaveWidget->SetEnemiesRemaining(EnemiesRemaining);
+		HUD->SetWave(CurrentWave);
+		HUD->SetEnemiesRemaining(EnemiesRemaining);
 	}
 
 	SpawnWaveEnemies();

@@ -43,7 +43,6 @@ void ABaseCharacter::Die_Implementation()
 	Destroy();
 }
 
-
 float ABaseCharacter::TakeDamage(float DamageAmount, const FDamageEvent& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
 {
 	UE_LOG(LogTemp, Log, TEXT("Take Damage %f"), DamageAmount);

@@ -115,9 +115,9 @@ void AEnemyCharacter::SpawnSplitters()
 	for (int32 i = 0; i < NumberOfSplits; ++i)
 	{
 		FVector Offset = FVector(
-			FMath::FRandRange(-50.f, 50.f),
-			FMath::FRandRange(-50.f, 50.f),
-			0.f
+			FMath::FRandRange(-50.0f, 50.0f),
+			FMath::FRandRange(-50.0f, 50.0f),
+			50.0f
 		);
 
 		FVector SpawnLocation = GetActorLocation() + Offset;
