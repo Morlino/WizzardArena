@@ -14,5 +14,4 @@ void ABarrierPickup::OnPickedUp(AWizzardCharacter* Player)
 	Player->ActivateShield(1);
 	UGameplayStatics::PlaySound2D(this, PickUpSound);
 	Destroy();
-
 }

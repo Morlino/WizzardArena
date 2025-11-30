@@ -370,6 +370,11 @@ void AWizzardCharacter::ActivateShield(int32 Hits)
 		bHasShield = true;
 		ShieldMesh->SetVisibility(true);
 	}
+
+	if (WizzardHUD)
+	{
+		WizzardHUD->SetShieldHits(ShieldHitsRemaining);
+	}
 }
 
 void AWizzardCharacter::BreakShield()
@@ -379,12 +384,22 @@ void AWizzardCharacter::BreakShield()
 
 	UGameplayStatics::PlaySound2D(this, BreakShieldSound);
 	ShieldMesh->SetVisibility(false);
+
+	if (WizzardHUD)
+	{
+		WizzardHUD->SetShieldHits(ShieldHitsRemaining);
+	}
 }
 
 void AWizzardCharacter::ApplyRapidFire(float Multiplier)
 {
 	ActiveRapidFireBuffs++;
 	ProjectileCastTime = BaseProjectileCastTime / FMath::Pow(Multiplier, ActiveRapidFireBuffs);
+
+	if (WizzardHUD)
+	{
+		WizzardHUD->SetRapidFireBuffs(ActiveRapidFireBuffs);
+	}
 }
 
 void AWizzardCharacter::RemoveRapidFire()
@@ -396,12 +411,22 @@ void AWizzardCharacter::RemoveRapidFire()
 		ActiveRapidFireBuffs = 0;
 		ProjectileCastTime = BaseProjectileCastTime;
 	}
+
+	if (WizzardHUD)
+	{
+		WizzardHUD->SetRapidFireBuffs(ActiveRapidFireBuffs);
+	}
 }
 
 void AWizzardCharacter::ApplySpeedBoost(float Amount)
 {
 	ActiveSpeedBuffs++;
 	GetCharacterMovement()->MaxWalkSpeed = BaseWalkSpeed + (Amount * ActiveSpeedBuffs);
+
+	if (WizzardHUD)
+	{
+		WizzardHUD->SetSpeedBuffs(ActiveSpeedBuffs);
+	}
 }
 
 void AWizzardCharacter::RemoveSpeedBoost(float Amount)
@@ -416,6 +441,11 @@ void AWizzardCharacter::RemoveSpeedBoost(float Amount)
 	else
 	{
 		GetCharacterMovement()->MaxWalkSpeed = BaseWalkSpeed + (Amount * ActiveSpeedBuffs);
+	}
+
+	if (WizzardHUD)
+	{
+		WizzardHUD->SetSpeedBuffs(ActiveSpeedBuffs);
 	}
 }
 

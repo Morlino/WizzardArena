@@ -110,7 +110,7 @@ public:
 	float DashDamageRadius = 150.0f;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Abilities")
-	float DashCooldown = 5.0f;
+	float DashCooldown = 1.0f;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Abilities")
 	class UAnimMontage* DashAnimation;

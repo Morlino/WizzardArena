@@ -3,8 +3,10 @@
 
 #include "WizzardPlayerController.h"
 #include "EnhancedInputSubsystems.h"
+#include "WaveManager.h"
 #include "WizzardCharacter.h"
 #include "WizzardHUD.h"
+#include "Kismet/GameplayStatics.h"
 
 void AWizzardPlayerController::BeginPlay()
 {
@@ -29,6 +31,8 @@ void AWizzardPlayerController::BeginPlay()
 			{
 				MyChar->SetHUDReference(WizzardHUD);
 			}
+
+			WizzardHUD->InitializeWidgets();
 		}
 	}
 }

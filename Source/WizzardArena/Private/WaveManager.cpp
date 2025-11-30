@@ -122,6 +122,14 @@ void AWaveManager::Tick(float DeltaTime)
 
 void AWaveManager::StartNextWave()
 {
+	if (!WaveWidget)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("WaveWidget not yet assigned, delaying wave start"));
+		// Try again next tick
+		GetWorldTimerManager().SetTimerForNextTick(this, &AWaveManager::StartNextWave);
+		return;
+	}
+
 	CurrentWave++;
 
 	if (CurrentWave > Waves.Num())
@@ -136,10 +144,6 @@ void AWaveManager::StartNextWave()
 		UE_LOG(LogTemp, Warning, TEXT("Wave %d"), CurrentWave);
 		WaveWidget->SetWave(CurrentWave);
 		WaveWidget->SetEnemiesRemaining(EnemiesRemaining);
-	}
-	else
-	{
-		UE_LOG(LogTemp, Warning, TEXT("WE ARE FUCKED"));
 	}
 
 	SpawnWaveEnemies();

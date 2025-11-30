@@ -30,14 +30,6 @@ void AWizzardGameMode::BeginPlay()
 
 	WaveMgr->OnAllWavesCompleted.AddDynamic(this, &AWizzardGameMode::HandleWinCondition);
 
-	WaveHUDInstance = CreateWidget<UWaveWidget>(GetWorld(), WaveWidgetClass);
-	if (!WaveHUDInstance)
-	{
-		UE_LOG(LogTemp, Error, TEXT("WaveWidgetClass is missing!"));
-		return;
-	}
-	WaveHUDInstance->AddToViewport();
-	WaveMgr->WaveWidget = WaveHUDInstance;
 	WaveMgr->StartNextWave();
 
 	if (LevelMusic)
