@@ -117,6 +117,9 @@ public:
 	class UAnimMontage* DashAnimation;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Condition")
+	bool CanRotate = true;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Condition")
 	bool HasWon = false;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Condition")

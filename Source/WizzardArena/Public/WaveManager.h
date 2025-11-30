@@ -82,7 +82,7 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	class UWizzardHUD* HUD;
 
-	UFUNCTION()
+	UFUNCTION(BlueprintCallable)
 	void StartNextWave();
 
 	UFUNCTION()

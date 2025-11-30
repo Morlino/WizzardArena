@@ -34,12 +34,29 @@ void AWizzardGameMode::BeginPlay()
 	WaveMgr->OnAllWavesCompleted.AddDynamic(this, &AWizzardGameMode::HandleLastDefaultWave);
 	WaveMgr->OnBossWavesCompleted.AddDynamic(this, &AWizzardGameMode::HandleBossDefeated);
 
-	// Delay StartNextWave by 1 seconds
-	FTimerHandle TimerHandle;
-	GetWorldTimerManager().SetTimer(TimerHandle, [WaveMgr]()
+	// Play Intro Cutscene if we have one
+	if (IntroSequence)
 	{
-		WaveMgr->StartNextWave();
-	}, 1.0f, false);
+		FTimerHandle IntroTimerHandle;
+		GetWorldTimerManager().SetTimer(
+			IntroTimerHandle,
+			[this]()
+			{
+				PlayIntroSequence();
+			},
+			0.5f, // short delay to make sure world is ready
+			false
+		);
+	}
+	else
+	{
+		// If no intro sequence, start first wave after 1 second
+		FTimerHandle TimerHandle;
+		GetWorldTimerManager().SetTimer(TimerHandle, [WaveMgr]()
+		{
+			WaveMgr->StartNextWave();
+		}, 1.0f, false);
+	}
 
 	if (LevelMusic)
 	{
@@ -66,6 +83,33 @@ void AWizzardGameMode::HandleLastDefaultWave()
 		2.0f, // delay in seconds
 		false // do not loop
 	);
+}
+
+void AWizzardGameMode::PlayIntroSequence()
+{
+	if (!IntroSequence) return;
+
+	if (AWizzardPlayerController* PC = Cast<AWizzardPlayerController>(GetWorld()->GetFirstPlayerController()))
+	{
+		PC->DisableInput(PC);
+	}
+
+	FMovieSceneSequencePlaybackSettings PlaybackSettings;
+
+	ALevelSequenceActor* SeqActor = GetWorld()->SpawnActor<ALevelSequenceActor>();
+	if (!SeqActor) return;
+
+	ULevelSequencePlayer* SeqPlayer = ULevelSequencePlayer::CreateLevelSequencePlayer(
+		GetWorld(),
+		IntroSequence,
+		PlaybackSettings,
+		SeqActor
+	);
+
+	if (SeqPlayer)
+	{
+		SeqPlayer->Play();
+	}
 }
 
 void AWizzardGameMode::PlayWinSequence()

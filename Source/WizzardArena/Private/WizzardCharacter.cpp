@@ -138,7 +138,7 @@ void AWizzardCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-	if (HasWon || HasLost)
+	if (CanRotate)
 		return;
 
 	// Cooldowns decrement
@@ -196,6 +196,7 @@ void AWizzardCharacter::Die_Implementation()
 	UGameplayStatics::PlaySound2D(this, DeathSound);
 	
 	HasLost = true;
+	CanRotate = false;
 }
 
 void AWizzardCharacter::Heal(float HealingAmount)
@@ -380,6 +381,7 @@ void AWizzardCharacter::HandleWin()
 {
 	GetCharacterMovement()->DisableMovement();
 	HasWon = true;
+	CanRotate = false;
 
 	// Rotate character down
 	FRotator WinRotation = FRotator(0, 180, 0);
