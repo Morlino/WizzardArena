@@ -131,6 +131,14 @@ public:
 	UPROPERTY(BlueprintReadWrite, Category="Powerups")
 	int32 ShieldHitsRemaining = 0;
 
+	// Rapid Fire
+	int32 ActiveRapidFireBuffs = 0;
+	float BaseProjectileCastTime = 0.f;
+
+	// Speed Boost
+	int32 ActiveSpeedBuffs = 0;
+	float BaseWalkSpeed = 0.f;
+
 	// FUNCTIONS
 	// Utility
 	virtual void Tick(float DeltaTime) override;
@@ -176,4 +184,10 @@ public:
 	void ActivateShield(int32 Hits);
 
 	void BreakShield();
+
+	void ApplyRapidFire(float Multiplier);
+
+	void RemoveRapidFire();
+	void ApplySpeedBoost(float Amount);
+	void RemoveSpeedBoost(float Amount);
 };

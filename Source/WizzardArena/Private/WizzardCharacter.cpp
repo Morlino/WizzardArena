@@ -61,6 +61,9 @@ void AWizzardCharacter::BeginPlay()
 {
 	Super::BeginPlay();
 
+	BaseProjectileCastTime = ProjectileCastTime;
+	BaseWalkSpeed = GetCharacterMovement()->MaxWalkSpeed;
+
 	OnHealthChanged.AddDynamic(this, &AWizzardCharacter::UpdateHealthHUD);
 }
 
@@ -358,12 +361,15 @@ void AWizzardCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCo
 	}
 }
 
-void AWizzardCharacter::ActivateShield(int32 Hits = 1)
+void AWizzardCharacter::ActivateShield(int32 Hits)
 {
-	bHasShield = true;
-	ShieldHitsRemaining = Hits;
+	ShieldHitsRemaining += Hits;
 
-	ShieldMesh->SetVisibility(true);
+	if (ShieldHitsRemaining > 0)
+	{
+		bHasShield = true;
+		ShieldMesh->SetVisibility(true);
+	}
 }
 
 void AWizzardCharacter::BreakShield()
@@ -375,8 +381,46 @@ void AWizzardCharacter::BreakShield()
 	ShieldMesh->SetVisibility(false);
 }
 
+void AWizzardCharacter::ApplyRapidFire(float Multiplier)
+{
+	ActiveRapidFireBuffs++;
+	ProjectileCastTime = BaseProjectileCastTime / FMath::Pow(Multiplier, ActiveRapidFireBuffs);
+}
+
+void AWizzardCharacter::RemoveRapidFire()
+{
+	ActiveRapidFireBuffs--;
+
+	if (ActiveRapidFireBuffs <= 0)
+	{
+		ActiveRapidFireBuffs = 0;
+		ProjectileCastTime = BaseProjectileCastTime;
+	}
+}
+
+void AWizzardCharacter::ApplySpeedBoost(float Amount)
+{
+	ActiveSpeedBuffs++;
+	GetCharacterMovement()->MaxWalkSpeed = BaseWalkSpeed + (Amount * ActiveSpeedBuffs);
+}
+
+void AWizzardCharacter::RemoveSpeedBoost(float Amount)
+{
+	ActiveSpeedBuffs--;
+
+	if (ActiveSpeedBuffs <= 0)
+	{
+		ActiveSpeedBuffs = 0;
+		GetCharacterMovement()->MaxWalkSpeed = BaseWalkSpeed;
+	}
+	else
+	{
+		GetCharacterMovement()->MaxWalkSpeed = BaseWalkSpeed + (Amount * ActiveSpeedBuffs);
+	}
+}
+
 void AWizzardCharacter::OnDashOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
-	UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
+                                      UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
 	if (!OtherActor || OtherActor == this) return;
 

@@ -9,18 +9,14 @@ void ARapidFirePickup::OnPickedUp(AWizzardCharacter* Player)
 	Super::OnPickedUp(Player);
 	if (!Player) return;
 
-	// Save the original cast time
-	const float OriginalProjectileCastTime = Player->ProjectileCastTime;
+	Player->ApplyRapidFire(CastSpeedBoostMultiplier);
 
-	Player->ProjectileCastTime /= CastSpeedBoostMultiplier;
-
-	// Start timer to reset it
 	FTimerHandle TimerHandle;
 	Player->GetWorldTimerManager().SetTimer(
 		TimerHandle,
-		[Player, OriginalProjectileCastTime]()
+		[Player]()
 		{
-			Player->ProjectileCastTime = OriginalProjectileCastTime;
+			Player->RemoveRapidFire();
 		},
 		CastSpeedBoostDuration,
 		false

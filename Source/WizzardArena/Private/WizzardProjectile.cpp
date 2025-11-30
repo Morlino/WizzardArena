@@ -41,6 +41,8 @@ void AWizzardProjectile::BeginPlay()
 {
 	Super::BeginPlay();
 
+	SetLifeSpan(LifeSpawn);
+	
 	ProjectileMesh->OnComponentHit.AddDynamic(this, &AWizzardProjectile::OnHit);
 }
 

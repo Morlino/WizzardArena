@@ -45,6 +45,9 @@ public:
 	class UNiagaraSystem* HitEffect;
 
 	float ProjectileSpeed = 2000.0f;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite);
+	float LifeSpawn = 10.0f;
 	
 	// Hit handling
 	UFUNCTION()

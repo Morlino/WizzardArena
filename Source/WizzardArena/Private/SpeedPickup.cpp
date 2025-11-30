@@ -9,22 +9,16 @@
 void ASpeedPickup::OnPickedUp(AWizzardCharacter* Player)
 {
 	Super::OnPickedUp(Player);
-
 	if (!Player) return;
 
-	UCharacterMovementComponent* MoveComp = Player->GetCharacterMovement();
-	if (!MoveComp) return;
-
-	const float OriginalSpeed = MoveComp->MaxWalkSpeed;
-
-	MoveComp->MaxWalkSpeed = OriginalSpeed + SpeedBoostAmount;
+	Player->ApplySpeedBoost(SpeedBoostAmount);
 
 	FTimerHandle TimerHandle;
 	GetWorld()->GetTimerManager().SetTimer(
 		TimerHandle,
-		[MoveComp, OriginalSpeed]()
+		[Player, this]()
 		{
-			MoveComp->MaxWalkSpeed = OriginalSpeed;
+			Player->RemoveSpeedBoost(SpeedBoostAmount);
 		},
 		BoostDuration,
 		false

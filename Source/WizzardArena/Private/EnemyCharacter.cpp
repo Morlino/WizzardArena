@@ -101,11 +101,11 @@ void AEnemyCharacter::SpawnRandomPickup()
 	if (!PickupToSpawn) return;
 
 	UCapsuleComponent* Capsule = GetCapsuleComponent();
-	FVector SpawnLocation = GetActorLocation() - FVector(0.f, 0.f, Capsule->GetScaledCapsuleHalfHeight()) + FVector(0.f, 0.f, 20.f);
+	FVector SpawnLocation = GetActorLocation();
 	FRotator SpawnRotation = FRotator::ZeroRotator;
 
 	FActorSpawnParameters SpawnParams;
-	SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButAlwaysSpawn;
+	SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
 
 	GetWorld()->SpawnActor<AActor>(PickupToSpawn, SpawnLocation, SpawnRotation, SpawnParams);
 }
