@@ -138,8 +138,10 @@ void AWizzardCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-	if (CanRotate)
+	if (!CanRotate)
+	{
 		return;
+	}
 
 	// Cooldowns decrement
 	FireCurrentCooldown -= DeltaTime;
