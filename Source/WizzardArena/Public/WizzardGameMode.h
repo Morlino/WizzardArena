@@ -47,9 +47,12 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Cutscene")
 	class ULevelSequence* IntroSequence;
 	
-	UFUNCTION()
-	void HandleLastDefaultWave();
 	void PlayIntroSequence();
 	void PlayWinSequence();
+
+	UFUNCTION()
+	void HandleLastDefaultWave();
+
+	UFUNCTION()
 	void HandleBossDefeated();
 };

@@ -75,11 +75,11 @@ void AWaveManager::OnEnemyKilled(ABaseCharacter* DeadEnemy)
 	if (EnemiesRemaining <= 0)
 	{
 		// If this was the final wave → trigger victory
-		if (CurrentWave >= Waves.Num())
+		if (CurrentWave == Waves.Num())
 		{
 			OnBossWavesCompleted.Broadcast();
 		}
-		else if (CurrentWave + 1 <= Waves.Num())
+		else if (CurrentWave == Waves.Num() - 1)
 		{
 			OnAllWavesCompleted.Broadcast();
 		}

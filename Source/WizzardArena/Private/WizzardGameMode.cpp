@@ -31,9 +31,6 @@ void AWizzardGameMode::BeginPlay()
 		return;
 	}
 
-	WaveMgr->OnAllWavesCompleted.AddDynamic(this, &AWizzardGameMode::HandleLastDefaultWave);
-	WaveMgr->OnBossWavesCompleted.AddDynamic(this, &AWizzardGameMode::HandleBossDefeated);
-
 	// Play Intro Cutscene if we have one
 	if (IntroSequence)
 	{
@@ -57,6 +54,9 @@ void AWizzardGameMode::BeginPlay()
 			WaveMgr->StartNextWave();
 		}, 1.0f, false);
 	}
+
+	WaveMgr->OnAllWavesCompleted.AddDynamic(this, &AWizzardGameMode::HandleLastDefaultWave);
+	WaveMgr->OnBossWavesCompleted.AddDynamic(this, &AWizzardGameMode::HandleBossDefeated);
 
 	if (LevelMusic)
 	{
@@ -139,7 +139,7 @@ void AWizzardGameMode::PlayWinSequence()
 
 void AWizzardGameMode::HandleBossDefeated()
 {
-	UE_LOG(LogTemp, Warning, TEXT("YOU WIN!"));
+	UE_LOG(LogTemp, Warning, TEXT("YOU WON! THANK YOU FOR PLAYING!"));
 
 	// Disable input for the first player
 	if (AWizzardPlayerController* PC = Cast<AWizzardPlayerController>(GetWorld()->GetFirstPlayerController()))
