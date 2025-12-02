@@ -74,8 +74,6 @@ void AWaveManager::OnEnemyKilled(ABaseCharacter* DeadEnemy)
 	// Check if wave is complete
 	if (EnemiesRemaining <= 0)
 	{
-		UE_LOG(LogTemp, Warning, TEXT("START NEXT WAVE"));
-
 		// If this was the final wave → trigger victory
 		if (CurrentWave >= Waves.Num())
 		{

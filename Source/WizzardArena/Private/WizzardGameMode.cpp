@@ -44,7 +44,7 @@ void AWizzardGameMode::BeginPlay()
 			{
 				PlayIntroSequence();
 			},
-			0.5f, // short delay to make sure world is ready
+			0.1f, // short delay to make sure world is ready
 			false
 		);
 	}
